@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-query";
 import type {
   PostResumesData,
+  PostResumesResponse,
   GetResumesByIdData,
   GetData,
 } from "../types.gen";
@@ -69,7 +70,7 @@ export const postResumesMutation = (
   options?: Partial<Options<PostResumesData>>
 ) => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    PostResumesResponse,
     DefaultError,
     Options<PostResumesData>
   > = {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { postResumesMutation } from "./@tanstack/react-query.gen";
+import { postResumesMutation } from "./client/@tanstack/react-query.gen";
 
 function HomePage() {
   const postResume = useMutation(postResumesMutation());
@@ -29,6 +29,7 @@ function HomePage() {
       {postResume.isPending && <p>Uploading...</p>}
       {postResume.error && <p>Error uploading file.</p>}
       {postResume.isSuccess && <p>Upload successful!</p>}
+      {postResume.data && <p>{postResume.data.id}</p>}
     </>
   );
 }

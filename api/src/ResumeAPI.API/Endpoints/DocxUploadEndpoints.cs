@@ -58,10 +58,11 @@ public static class DocxUploadEndpoints
                     db.Documents.Add(documentRecord);
                     await db.SaveChangesAsync();
 
-                    return Results.Ok(s3Key);
+                    return Results.Ok(new UploadResumeResponse { Id = documentRecord.Id });
                 }
             )
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .Produces<UploadResumeResponse>();
 
         endpoints
             .MapGet(

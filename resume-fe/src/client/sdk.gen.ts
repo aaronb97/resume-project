@@ -8,6 +8,7 @@ import {
 } from "@hey-api/client-fetch";
 import type {
   PostResumesData,
+  PostResumesResponse,
   GetResumesByIdData,
   GetData,
   GetResponse,
@@ -35,7 +36,7 @@ export const postResumes = <ThrowOnError extends boolean = false>(
   options?: Options<PostResumesData, ThrowOnError>
 ) => {
   return (options?.client ?? _heyApiClient).post<
-    unknown,
+    PostResumesResponse,
     unknown,
     ThrowOnError
   >({
