@@ -19,6 +19,7 @@ function HomePage() {
     <>
       <input
         type="file"
+        accept=".docx"
         onChange={(e) => {
           setSelectedFile(e.target.files![0]);
         }}
