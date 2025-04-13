@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using ResumeAPI;
 using ResumeAPI.Endpoints;
 using ResumeAPI.Models;
+using ResumeAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
 
     return new AmazonS3Client(config);
 });
+
+builder.Services.AddSingleton<AiService>();
 
 var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
