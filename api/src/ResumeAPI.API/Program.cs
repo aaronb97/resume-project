@@ -47,6 +47,20 @@ if (builder.Environment.IsDevelopment())
     });
 }
 
+const string corsPolicy = "CorsPolicy";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        corsPolicy,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173").AllowAnyMethod().AllowAnyHeader();
+        }
+    );
+});
+
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -67,5 +81,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapDocxUpload();
 app.MapGet("/", () => "Hello World!");
+
+app.UseCors(corsPolicy);
 
 app.Run();
