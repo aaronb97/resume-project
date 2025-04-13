@@ -20,11 +20,11 @@ public class AiService
             .Build();
     }
 
-    public async Task<ResumeAIResponse> GetRecommendations(string jobDescritpion, string resume)
+    public async Task<ResumeAiResponse> GetRecommendations(string jobDescritpion, string resume)
     {
         var executionSettings = new OpenAIPromptExecutionSettings()
         {
-            ResponseFormat = typeof(ResumeAIResponse),
+            ResponseFormat = typeof(ResumeAiResponse),
         };
 
         var prompt =
@@ -61,7 +61,7 @@ END RESUME";
 
         var result = await _kernel.InvokePromptAsync(prompt, new(executionSettings));
 
-        return JsonSerializer.Deserialize<ResumeAIResponse>(result.ToString())
+        return JsonSerializer.Deserialize<ResumeAiResponse>(result.ToString())
             ?? throw new JsonException("Failed to deserialize response.");
     }
 }

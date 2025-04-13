@@ -1,6 +1,6 @@
 namespace ResumeAPI.Models;
 
-public class ResumeAIResponse
+public class ResumeAiResponse
 {
     public required Recommendation[] Recommendations { get; set; }
 }
