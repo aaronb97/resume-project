@@ -1,11 +1,10 @@
-using System.Text;
 using Amazon.S3;
 using Amazon.S3.Model;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Extensions.Options;
 using ResumeAPI.Models;
 using ResumeAPI.Services;
+using ResumeAPI.Utils;
 
 namespace ResumeAPI.Endpoints;
 
@@ -101,40 +100,11 @@ public static class DocxUploadEndpoints
                     await s3Stream.CopyToAsync(editableStream);
                     editableStream.Position = 0;
 
-                    var resumeTextBuilder = new StringBuilder();
-                    var lineCount = 0;
-
-                    using (
-                        WordprocessingDocument wordDoc = WordprocessingDocument.Open(
-                            editableStream,
-                            true
-                        )
-                    )
-                    {
-                        var body = wordDoc.MainDocumentPart.Document.Body;
-
-                        foreach (Paragraph para in body.Elements<Paragraph>())
-                        {
-                            foreach (Run run in para.Elements<Run>())
-                            {
-                                foreach (Text text in run.Elements<Text>())
-                                {
-                                    if (text.Text.Length > 25)
-                                    {
-                                        resumeTextBuilder.AppendLine(
-                                            $" Line {lineCount}: {text.Text} "
-                                        );
-                                    }
-
-                                    lineCount++;
-                                }
-                            }
-                        }
-                    }
+                    using var wordDoc = WordprocessingDocument.Open(editableStream, true);
 
                     var recommendations = await aiService.GetRecommendations(
                         request.JobDescription,
-                        resumeTextBuilder.ToString()
+                        wordDoc.GetResumeText()
                     );
 
                     return Results.Ok(recommendations);
