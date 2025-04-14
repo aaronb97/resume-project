@@ -2,27 +2,27 @@
 
 export type AiRecommendation = {
   lineNum: number;
-  text: string | null;
-  rationale: string | null;
+  text: string;
+  rationale: string;
 };
 
 export type JobDescriptionRequest = {
   id?: string;
-  jobDescription: string | null;
+  jobDescription: string;
 };
 
 export type ProcessRecommendationsRequest = {
   id: string;
-  recommendations: Array<RecommendationToProcess> | null;
+  recommendations: Array<RecommendationToProcess>;
 };
 
 export type RecommendationToProcess = {
-  text: string | null;
+  text: string;
   lineNum: number;
 };
 
 export type ResumeAiResponse = {
-  recommendations: Array<AiRecommendation> | null;
+  recommendations: Array<AiRecommendation>;
 };
 
 export type UploadResumeResponse = {

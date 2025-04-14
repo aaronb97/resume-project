@@ -44,6 +44,8 @@ if (builder.Environment.IsDevelopment())
                 Version = "v1",
             }
         );
+
+        c.SupportNonNullableReferenceTypes();
     });
 }
 
