@@ -20,7 +20,7 @@ public class AiService
             .Build();
     }
 
-    public async Task<ResumeAiResponse> GetRecommendations(string jobDescritpion, string resume)
+    public async Task<ResumeAiResponse> GetRecommendations(string jobDescription, string resume)
     {
         var executionSettings = new OpenAIPromptExecutionSettings()
         {
@@ -49,7 +49,7 @@ If no changes are necessary for a line, leave the text blank.
 
 START JOB DESCRIPTION: 
 
-{jobDescritpion}
+{jobDescription}
 
 END JOB DESCRIPTION
 
