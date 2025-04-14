@@ -1,11 +1,26 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { postResumesMutation } from "./client/@tanstack/react-query.gen";
+import { useDropzone } from "react-dropzone";
 
 function HomePage() {
   const postResume = useMutation(postResumesMutation());
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      setSelectedFile(acceptedFiles[0]);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    multiple: false,
+    accept: {
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [".docx"],
+    },
+  });
 
   const handleUpload = () => {
     if (selectedFile) {
@@ -17,16 +32,28 @@ function HomePage() {
 
   return (
     <>
-      <input
-        type="file"
-        accept=".docx"
-        onChange={(e) => {
-          setSelectedFile(e.target.files![0]);
+      <div
+        {...getRootProps()}
+        style={{
+          border: "2px dashed #cccccc",
+          borderRadius: "8px",
+          padding: "20px",
+          textAlign: "center",
+          cursor: "pointer",
         }}
-      />
-      <button disabled={!selectedFile} onClick={handleUpload}>
-        Upload
-      </button>
+      >
+        <input {...getInputProps()} />
+        {isDragActive ? (
+          <p>Drop the file here ...</p>
+        ) : selectedFile ? (
+          <p>Selected file: {selectedFile.name}</p>
+        ) : (
+          <p>Drag and drop a .docx file here, or click to select one</p>
+        )}
+        <button disabled={!selectedFile} onClick={handleUpload}>
+          Upload
+        </button>
+      </div>
       {postResume.isPending && <p>Uploading...</p>}
       {postResume.error && <p>Error uploading file.</p>}
       {postResume.isSuccess && <p>Upload successful!</p>}
