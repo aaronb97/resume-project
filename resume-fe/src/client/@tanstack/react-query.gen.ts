@@ -4,6 +4,7 @@ import {
   type Options,
   postResumes,
   postResumesRecommend,
+  postResumesProcessRecommendations,
   get,
 } from "../sdk.gen";
 import {
@@ -16,6 +17,7 @@ import type {
   PostResumesResponse,
   PostResumesRecommendData,
   PostResumesRecommendResponse,
+  PostResumesProcessRecommendationsData,
   GetData,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
@@ -123,6 +125,47 @@ export const postResumesRecommendMutation = (
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await postResumesRecommend({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const postResumesProcessRecommendationsQueryKey = (
+  options: Options<PostResumesProcessRecommendationsData>
+) => createQueryKey("postResumesProcessRecommendations", options);
+
+export const postResumesProcessRecommendationsOptions = (
+  options: Options<PostResumesProcessRecommendationsData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postResumesProcessRecommendations({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postResumesProcessRecommendationsQueryKey(options),
+  });
+};
+
+export const postResumesProcessRecommendationsMutation = (
+  options?: Partial<Options<PostResumesProcessRecommendationsData>>
+) => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<PostResumesProcessRecommendationsData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await postResumesProcessRecommendations({
         ...options,
         ...localOptions,
         throwOnError: true,

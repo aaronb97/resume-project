@@ -11,6 +11,16 @@ export type JobDescriptionRequest = {
   jobDescription: string | null;
 };
 
+export type ProcessRecommendationsRequest = {
+  id: string;
+  recommendations: Array<RecommendationToProcess> | null;
+};
+
+export type RecommendationToProcess = {
+  text: string | null;
+  lineNum: number;
+};
+
 export type ResumeAiResponse = {
   recommendations: Array<AiRecommendation> | null;
 };
@@ -54,6 +64,20 @@ export type PostResumesRecommendResponses = {
 
 export type PostResumesRecommendResponse =
   PostResumesRecommendResponses[keyof PostResumesRecommendResponses];
+
+export type PostResumesProcessRecommendationsData = {
+  body: ProcessRecommendationsRequest;
+  path?: never;
+  query?: never;
+  url: "/resumes/processRecommendations";
+};
+
+export type PostResumesProcessRecommendationsResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
 
 export type GetData = {
   body?: never;

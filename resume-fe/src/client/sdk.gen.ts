@@ -11,6 +11,7 @@ import type {
   PostResumesResponse,
   PostResumesRecommendData,
   PostResumesRecommendResponse,
+  PostResumesProcessRecommendationsData,
   GetData,
   GetResponse,
 } from "./types.gen";
@@ -66,6 +67,23 @@ export const postResumesRecommend = <ThrowOnError extends boolean = false>(
       ...options?.headers,
     },
   });
+};
+
+export const postResumesProcessRecommendations = <
+  ThrowOnError extends boolean = false
+>(
+  options: Options<PostResumesProcessRecommendationsData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<unknown, unknown, ThrowOnError>(
+    {
+      url: "/resumes/processRecommendations",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+      },
+    }
+  );
 };
 
 export const get = <ThrowOnError extends boolean = false>(
