@@ -9,7 +9,8 @@ import {
 import type {
   PostResumesData,
   PostResumesResponse,
-  GetResumesByIdData,
+  PostResumesRecommendData,
+  PostResumesRecommendResponse,
   GetData,
   GetResponse,
 } from "./types.gen";
@@ -50,12 +51,20 @@ export const postResumes = <ThrowOnError extends boolean = false>(
   });
 };
 
-export const getResumesById = <ThrowOnError extends boolean = false>(
-  options: Options<GetResumesByIdData, ThrowOnError>
+export const postResumesRecommend = <ThrowOnError extends boolean = false>(
+  options: Options<PostResumesRecommendData, ThrowOnError>
 ) => {
-  return (options.client ?? _heyApiClient).get<unknown, unknown, ThrowOnError>({
-    url: "/resumes/{id}",
+  return (options.client ?? _heyApiClient).post<
+    PostResumesRecommendResponse,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/resumes/recommend",
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
   });
 };
 
