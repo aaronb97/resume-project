@@ -16,7 +16,10 @@ public class AiService
     {
         _kernel = Kernel
             .CreateBuilder()
-            .AddOpenAIChatCompletion(modelId: "gpt-4o", apiKey: configuration["OpenAI:ApiKey"]!)
+            .AddOpenAIChatCompletion(
+                modelId: "gpt-4.1-nano",
+                apiKey: configuration["OpenAI:ApiKey"]!
+            )
             .Build();
     }
 
