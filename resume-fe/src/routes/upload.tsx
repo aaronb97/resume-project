@@ -3,6 +3,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { postResumesMutation } from "../client/@tanstack/react-query.gen";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/upload")({
   component: RouteComponent,
@@ -71,9 +72,9 @@ function RouteComponent() {
         )}
       </div>
 
-      <button disabled={!selectedFile} onClick={handleUpload}>
+      <Button disabled={!selectedFile} onClick={handleUpload}>
         Upload
-      </button>
+      </Button>
 
       {postResume.isPending && <p>Uploading...</p>}
       {postResume.error && <p>Error uploading file.</p>}

@@ -4,6 +4,7 @@ import {
   postResumesRecommendOptions,
   postResumesRecommendQueryKey,
 } from "../client/@tanstack/react-query.gen";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
@@ -29,13 +30,13 @@ function RouteComponent() {
 
   return (
     <div>
-      <button
+      <Button
         onClick={() => {
           router.navigate({ to: "/upload" });
         }}
       >
         Start over
-      </button>
+      </Button>
 
       {data.recommendations
         .filter((recc) => recc.text)
@@ -46,7 +47,7 @@ function RouteComponent() {
           </div>
         ))}
 
-      <button
+      <Button
         onClick={() => {
           queryClient.invalidateQueries({
             queryKey: postResumesRecommendQueryKey(queryOptions),
@@ -54,7 +55,7 @@ function RouteComponent() {
         }}
       >
         Try Again
-      </button>
+      </Button>
     </div>
   );
 }
