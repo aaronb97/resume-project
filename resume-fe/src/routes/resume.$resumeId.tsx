@@ -38,7 +38,7 @@ function RouteComponent() {
       </button>
 
       {data.recommendations.map((recc) => (
-        <div style={{ marginTop: "8px" }}>
+        <div style={{ marginTop: "8px" }} key={recc.text}>
           <p>{recc.text}</p>
           <p style={{ color: "gray", fontSize: "12px" }}>{recc.rationale}</p>
         </div>

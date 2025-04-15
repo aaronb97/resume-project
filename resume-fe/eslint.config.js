@@ -8,7 +8,11 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   { ignores: ["dist"] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [
+      js.configs.recommended,
+      react.configs.flat.recommended,
+      ...tseslint.configs.recommended,
+    ],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
@@ -26,6 +30,8 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "react/jsx-newline": ["error", { prevent: true, allowMultilines: true }],
+      "react/react-in-jsx-scope": 0,
+      "react/jsx-uses-react": 0,
     },
   }
 );
