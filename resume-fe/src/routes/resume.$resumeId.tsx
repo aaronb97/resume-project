@@ -1,6 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { postResumesRecommendOptions } from "../client/@tanstack/react-query.gen";
+import {
+  postResumesRecommendOptions,
+  postResumesRecommendQueryKey,
+} from "../client/@tanstack/react-query.gen";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
@@ -9,15 +12,18 @@ export const Route = createFileRoute("/resume/$resumeId")({
 function RouteComponent() {
   const { resumeId } = Route.useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
-    ...postResumesRecommendOptions({
-      body: { id: resumeId, jobDescription: "Senior developer" },
-    }),
+  const queryOptions = {
+    body: { id: resumeId, jobDescription: "Senior developer" },
+  };
+
+  const { data, isFetching } = useQuery({
+    ...postResumesRecommendOptions(queryOptions),
     staleTime: Infinity,
   });
 
-  if (isLoading || !data) {
+  if (isFetching || !data) {
     return <div>Loading your recommendations...</div>;
   }
 
@@ -36,6 +42,15 @@ function RouteComponent() {
           <p style={{ color: "gray", fontSize: "12px" }}>{recc.rationale}</p>
         </div>
       ))}
+      <button
+        onClick={() => {
+          queryClient.invalidateQueries({
+            queryKey: postResumesRecommendQueryKey(queryOptions),
+          });
+        }}
+      >
+        Try Again
+      </button>
     </div>
   );
 }
