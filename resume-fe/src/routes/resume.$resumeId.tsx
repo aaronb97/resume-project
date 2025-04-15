@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { postResumesRecommendOptions } from "../client/@tanstack/react-query.gen";
 
 export const Route = createFileRoute("/resume/$resumeId")({
@@ -8,6 +8,7 @@ export const Route = createFileRoute("/resume/$resumeId")({
 
 function RouteComponent() {
   const { resumeId } = Route.useParams();
+  const router = useRouter();
 
   const { data, isLoading } = useQuery({
     ...postResumesRecommendOptions({
@@ -22,6 +23,13 @@ function RouteComponent() {
 
   return (
     <div>
+      <button
+        onClick={() => {
+          router.navigate({ to: "/upload" });
+        }}
+      >
+        Start over
+      </button>
       {data.recommendations.map((recc) => (
         <div style={{ marginTop: "8px" }}>
           <p>{recc.text}</p>
