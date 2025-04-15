@@ -26,13 +26,13 @@ export type QueryKey<TOptions extends Options> = [
   Pick<TOptions, "baseUrl" | "body" | "headers" | "path" | "query"> & {
     _id: string;
     _infinite?: boolean;
-  }
+  },
 ];
 
 const createQueryKey = <TOptions extends Options>(
   id: string,
   options?: TOptions,
-  infinite?: boolean
+  infinite?: boolean,
 ): [QueryKey<TOptions>[0]] => {
   const params: QueryKey<TOptions>[0] = {
     _id: id,
@@ -75,7 +75,7 @@ export const postResumesOptions = (options?: Options<PostResumesData>) => {
 };
 
 export const postResumesMutation = (
-  options?: Partial<Options<PostResumesData>>
+  options?: Partial<Options<PostResumesData>>,
 ) => {
   const mutationOptions: UseMutationOptions<
     PostResumesResponse,
@@ -95,11 +95,11 @@ export const postResumesMutation = (
 };
 
 export const postResumesRecommendQueryKey = (
-  options: Options<PostResumesRecommendData>
+  options: Options<PostResumesRecommendData>,
 ) => createQueryKey("postResumesRecommend", options);
 
 export const postResumesRecommendOptions = (
-  options: Options<PostResumesRecommendData>
+  options: Options<PostResumesRecommendData>,
 ) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
@@ -116,7 +116,7 @@ export const postResumesRecommendOptions = (
 };
 
 export const postResumesRecommendMutation = (
-  options?: Partial<Options<PostResumesRecommendData>>
+  options?: Partial<Options<PostResumesRecommendData>>,
 ) => {
   const mutationOptions: UseMutationOptions<
     PostResumesRecommendResponse,
@@ -136,11 +136,11 @@ export const postResumesRecommendMutation = (
 };
 
 export const postResumesProcessRecommendationsQueryKey = (
-  options: Options<PostResumesProcessRecommendationsData>
+  options: Options<PostResumesProcessRecommendationsData>,
 ) => createQueryKey("postResumesProcessRecommendations", options);
 
 export const postResumesProcessRecommendationsOptions = (
-  options: Options<PostResumesProcessRecommendationsData>
+  options: Options<PostResumesProcessRecommendationsData>,
 ) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
@@ -157,7 +157,7 @@ export const postResumesProcessRecommendationsOptions = (
 };
 
 export const postResumesProcessRecommendationsMutation = (
-  options?: Partial<Options<PostResumesProcessRecommendationsData>>
+  options?: Partial<Options<PostResumesProcessRecommendationsData>>,
 ) => {
   const mutationOptions: UseMutationOptions<
     unknown,

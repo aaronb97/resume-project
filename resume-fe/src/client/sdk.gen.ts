@@ -19,7 +19,7 @@ import { client as _heyApiClient } from "./client.gen";
 
 export type Options<
   TData extends TDataShape = TDataShape,
-  ThrowOnError extends boolean = boolean
+  ThrowOnError extends boolean = boolean,
 > = ClientOptions<TData, ThrowOnError> & {
   /**
    * You can provide a client instance returned by `createClient()` instead of
@@ -35,7 +35,7 @@ export type Options<
 };
 
 export const postResumes = <ThrowOnError extends boolean = false>(
-  options?: Options<PostResumesData, ThrowOnError>
+  options?: Options<PostResumesData, ThrowOnError>,
 ) => {
   return (options?.client ?? _heyApiClient).post<
     PostResumesResponse,
@@ -53,7 +53,7 @@ export const postResumes = <ThrowOnError extends boolean = false>(
 };
 
 export const postResumesRecommend = <ThrowOnError extends boolean = false>(
-  options: Options<PostResumesRecommendData, ThrowOnError>
+  options: Options<PostResumesRecommendData, ThrowOnError>,
 ) => {
   return (options.client ?? _heyApiClient).post<
     PostResumesRecommendResponse,
@@ -70,9 +70,9 @@ export const postResumesRecommend = <ThrowOnError extends boolean = false>(
 };
 
 export const postResumesProcessRecommendations = <
-  ThrowOnError extends boolean = false
+  ThrowOnError extends boolean = false,
 >(
-  options: Options<PostResumesProcessRecommendationsData, ThrowOnError>
+  options: Options<PostResumesProcessRecommendationsData, ThrowOnError>,
 ) => {
   return (options.client ?? _heyApiClient).post<unknown, unknown, ThrowOnError>(
     {
@@ -82,12 +82,12 @@ export const postResumesProcessRecommendations = <
         "Content-Type": "application/json",
         ...options?.headers,
       },
-    }
+    },
   );
 };
 
 export const get = <ThrowOnError extends boolean = false>(
-  options?: Options<GetData, ThrowOnError>
+  options?: Options<GetData, ThrowOnError>,
 ) => {
   return (options?.client ?? _heyApiClient).get<
     GetResponse,

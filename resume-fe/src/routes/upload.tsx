@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { postResumesMutation } from "../client/@tanstack/react-query.gen";
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/upload")({
 function RouteComponent() {
   const postResume = useMutation(postResumesMutation());
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const router = useRouter();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -29,7 +30,19 @@ function RouteComponent() {
 
   const handleUpload = () => {
     if (selectedFile) {
-      postResume.mutate({ body: { file: selectedFile } });
+      postResume.mutate(
+        { body: { file: selectedFile } },
+        {
+          onSuccess: (data) => {
+            if (data.id) {
+              router.navigate({
+                to: "/resume/$resumeId",
+                params: { resumeId: data.id },
+              });
+            }
+          },
+        }
+      );
     } else {
       alert("Please select a file first.");
     }
@@ -55,10 +68,10 @@ function RouteComponent() {
         ) : (
           <p>Drag and drop a .docx file here, or click to select one</p>
         )}
-        <button disabled={!selectedFile} onClick={handleUpload}>
-          Upload
-        </button>
       </div>
+      <button disabled={!selectedFile} onClick={handleUpload}>
+        Upload
+      </button>
       {postResume.isPending && <p>Uploading...</p>}
       {postResume.error && <p>Error uploading file.</p>}
       {postResume.isSuccess && <p>Upload successful!</p>}

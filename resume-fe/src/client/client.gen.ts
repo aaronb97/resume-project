@@ -18,11 +18,11 @@ import {
  */
 export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> =
   (
-    override?: Config<DefaultClientOptions & T>
+    override?: Config<DefaultClientOptions & T>,
   ) => Config<Required<DefaultClientOptions> & T>;
 
 export const client = createClient(
   createConfig<ClientOptions>({
     baseUrl: "http://localhost:5185",
-  })
+  }),
 );

@@ -7,7 +7,7 @@ export type AiRecommendation = {
 };
 
 export type JobDescriptionRequest = {
-  id?: string;
+  id: string;
   jobDescription: string;
 };
 
