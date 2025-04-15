@@ -36,12 +36,14 @@ function RouteComponent() {
       >
         Start over
       </button>
+
       {data.recommendations.map((recc) => (
         <div style={{ marginTop: "8px" }}>
           <p>{recc.text}</p>
           <p style={{ color: "gray", fontSize: "12px" }}>{recc.rationale}</p>
         </div>
       ))}
+
       <button
         onClick={() => {
           queryClient.invalidateQueries({

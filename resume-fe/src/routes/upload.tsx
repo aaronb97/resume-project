@@ -61,6 +61,7 @@ function RouteComponent() {
         }}
       >
         <input {...getInputProps()} />
+
         {isDragActive ? (
           <p>Drop the file here ...</p>
         ) : selectedFile ? (
@@ -69,9 +70,11 @@ function RouteComponent() {
           <p>Drag and drop a .docx file here, or click to select one</p>
         )}
       </div>
+
       <button disabled={!selectedFile} onClick={handleUpload}>
         Upload
       </button>
+
       {postResume.isPending && <p>Uploading...</p>}
       {postResume.error && <p>Error uploading file.</p>}
       {postResume.isSuccess && <p>Upload successful!</p>}
