@@ -8,8 +8,9 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <React.Fragment>
-      <div>Nothing here yet</div>
-      <Outlet />
+      <div className="p-2 h-screen">
+        <Outlet />
+      </div>
     </React.Fragment>
   );
 }

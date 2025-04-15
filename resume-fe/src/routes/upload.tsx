@@ -50,16 +50,10 @@ function RouteComponent() {
   };
 
   return (
-    <>
+    <div className="flex flex-col items-center gap-2 h-9/10 mt-12">
       <div
         {...getRootProps()}
-        style={{
-          border: "2px dashed #cccccc",
-          borderRadius: "8px",
-          padding: "20px",
-          textAlign: "center",
-          cursor: "pointer",
-        }}
+        className="w-full h-80 flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-5 text-center cursor-pointer"
       >
         <input {...getInputProps()} />
 
@@ -72,14 +66,16 @@ function RouteComponent() {
         )}
       </div>
 
-      <Button disabled={!selectedFile} onClick={handleUpload}>
-        Upload
-      </Button>
+      {selectedFile && (
+        <Button size={"lg"} onClick={handleUpload}>
+          Upload
+        </Button>
+      )}
 
       {postResume.isPending && <p>Uploading...</p>}
       {postResume.error && <p>Error uploading file.</p>}
       {postResume.isSuccess && <p>Upload successful!</p>}
       {postResume.data && <p>{postResume.data.id}</p>}
-    </>
+    </div>
   );
 }
