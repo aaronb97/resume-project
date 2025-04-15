@@ -1,9 +1,14 @@
-import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { postResumesMutation } from "./client/@tanstack/react-query.gen";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { postResumesMutation } from "../client/@tanstack/react-query.gen";
 
-function HomePage() {
+export const Route = createFileRoute("/upload")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
   const postResume = useMutation(postResumesMutation());
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -61,5 +66,3 @@ function HomePage() {
     </>
   );
 }
-
-export default HomePage;
