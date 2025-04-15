@@ -40,9 +40,9 @@ function RouteComponent() {
       {data.recommendations
         .filter((recc) => recc.text)
         .map((recc) => (
-          <div style={{ marginTop: "8px" }} key={recc.text}>
+          <div className="mt-8" key={recc.text}>
             <p>{recc.text}</p>
-            <p style={{ color: "gray", fontSize: "12px" }}>{recc.rationale}</p>
+            <p className="text-gray-500">{recc.rationale}</p>
           </div>
         ))}
 
