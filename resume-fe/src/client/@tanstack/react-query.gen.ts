@@ -20,6 +20,7 @@ import type {
   PostResumesRecommendData,
   PostResumesRecommendResponse,
   PostResumesProcessRecommendationsData,
+  PostResumesProcessRecommendationsResponse,
   GetData,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
@@ -180,7 +181,7 @@ export const postResumesProcessRecommendationsMutation = (
   options?: Partial<Options<PostResumesProcessRecommendationsData>>,
 ) => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    PostResumesProcessRecommendationsResponse,
     DefaultError,
     Options<PostResumesProcessRecommendationsData>
   > = {

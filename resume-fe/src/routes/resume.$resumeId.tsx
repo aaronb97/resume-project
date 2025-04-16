@@ -1,33 +1,68 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import {
-  getResumesByIdOptions,
-  postResumesRecommendOptions,
-  postResumesRecommendQueryKey,
-} from "../client/@tanstack/react-query.gen";
+import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
+import { useRef, useState } from "react";
+import {
+  AiRecommendation,
+  postResumesProcessRecommendations,
+  postResumesRecommend,
+} from "@/client";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
 });
 
+let initialProcessed = false;
+
 function RouteComponent() {
   const { resumeId } = Route.useParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const queryOptions = {
     body: { id: resumeId, jobDescription: "Senior developer" },
   };
 
-  const { data: reccData } = useQuery({
-    ...postResumesRecommendOptions(queryOptions),
-    staleTime: Infinity,
-  });
+  const [recommendations, setRecommendations] = useState<AiRecommendation[]>();
 
   const { data: docData } = useQuery(
     getResumesByIdOptions({ path: { id: resumeId } })
   );
+
+  function getRecommendations() {
+    setRecommendations(undefined);
+
+    postResumesRecommend(queryOptions).then((response) => {
+      const recommendationsResponse = response.data;
+      if (!recommendationsResponse) {
+        alert("failed to get recs");
+        return;
+      }
+
+      setRecommendations(response.data?.recommendations);
+
+      postResumesProcessRecommendations({
+        body: {
+          id: resumeId,
+          recommendations: recommendationsResponse.recommendations,
+        },
+      }).then(() => {
+        setTimeout(() => {
+          if (iframeRef.current) {
+            iframeRef.current.src += "";
+          }
+        }, 100);
+      });
+    });
+  }
+
+  if (!initialProcessed) {
+    initialProcessed = true;
+    getRecommendations();
+  }
+
+  console.log(docData?.signedUrl);
 
   if (!docData) return null;
 
@@ -49,12 +84,16 @@ function RouteComponent() {
 
       <div className="w-full flex gap-4 flex-1">
         <div className="flex-1">
-          <iframe className="w-full h-full" src={iframeUrl}></iframe>
+          <iframe
+            ref={iframeRef}
+            className="w-full h-full"
+            src={iframeUrl}
+          ></iframe>
         </div>
 
         <div className="flex-1">
-          {reccData?.recommendations
-            .filter((recc) => recc.text)
+          {recommendations
+            ?.filter((recc) => recc.text)
             .map((recc) => (
               <div className="mt-4" key={recc.text}>
                 <p>{recc.text}</p>
@@ -64,9 +103,7 @@ function RouteComponent() {
 
           <Button
             onClick={() => {
-              queryClient.invalidateQueries({
-                queryKey: postResumesRecommendQueryKey(queryOptions),
-              });
+              getRecommendations();
             }}
           >
             Try Again

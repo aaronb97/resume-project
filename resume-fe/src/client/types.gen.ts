@@ -96,10 +96,13 @@ export type PostResumesProcessRecommendationsData = {
 
 export type PostResumesProcessRecommendationsResponses = {
   /**
-   * OK
+   * No Content
    */
-  200: unknown;
+  204: void;
 };
+
+export type PostResumesProcessRecommendationsResponse =
+  PostResumesProcessRecommendationsResponses[keyof PostResumesProcessRecommendationsResponses];
 
 export type GetData = {
   body?: never;

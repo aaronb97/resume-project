@@ -187,7 +187,6 @@ public static class DocxUploadEndpoints
                     };
 
                     using var getResponse = await s3Client.GetObjectAsync(getRequest);
-
                     using var s3Stream = new MemoryStream();
                     await getResponse.ResponseStream.CopyToAsync(s3Stream);
                     s3Stream.Position = 0;
@@ -221,15 +220,23 @@ public static class DocxUploadEndpoints
                     }
 
                     editableStream.Position = 0;
+                    var previewKey = documentRecord.S3Key + ".preview";
+                    var putRequest = new PutObjectRequest
+                    {
+                        BucketName = s3Settings.Value.BucketName,
+                        Key = previewKey,
+                        InputStream = editableStream,
+                        ContentType =
+                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        Metadata = { ["file-name"] = documentRecord.FileName },
+                    };
+                    await s3Client.PutObjectAsync(putRequest);
 
-                    return Results.File(
-                        editableStream,
-                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        "modified.docx"
-                    );
+                    return Results.NoContent();
                 }
             )
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .Produces(204);
 
         return endpoints;
     }
