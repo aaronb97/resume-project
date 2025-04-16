@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Amazon;
 using Amazon.S3;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,15 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
     };
 
     return new AmazonS3Client(config);
+});
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 builder.Services.AddSingleton<AiService>();
