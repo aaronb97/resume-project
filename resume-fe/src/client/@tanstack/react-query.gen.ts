@@ -3,6 +3,7 @@
 import {
   type Options,
   postResumes,
+  getResumesById,
   postResumesRecommend,
   postResumesProcessRecommendations,
   get,
@@ -15,6 +16,7 @@ import {
 import type {
   PostResumesData,
   PostResumesResponse,
+  GetResumesByIdData,
   PostResumesRecommendData,
   PostResumesRecommendResponse,
   PostResumesProcessRecommendationsData,
@@ -92,6 +94,24 @@ export const postResumesMutation = (
     },
   };
   return mutationOptions;
+};
+
+export const getResumesByIdQueryKey = (options: Options<GetResumesByIdData>) =>
+  createQueryKey("getResumesById", options);
+
+export const getResumesByIdOptions = (options: Options<GetResumesByIdData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getResumesById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getResumesByIdQueryKey(options),
+  });
 };
 
 export const postResumesRecommendQueryKey = (

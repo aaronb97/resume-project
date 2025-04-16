@@ -33,35 +33,90 @@ public static class DocxUploadEndpoints
                         return Results.BadRequest("Only .docx files are allowed.");
                     }
 
-                    using var stream = file.OpenReadStream();
+                    using var fileStream = file.OpenReadStream();
+                    using var memoryStream = new MemoryStream();
+                    await fileStream.CopyToAsync(memoryStream);
+                    var fileBytes = memoryStream.ToArray();
+
                     var s3Key = $"resumes/{Guid.NewGuid()}";
+                    var previewKey = $"{s3Key}.preview";
 
                     var putRequest = new PutObjectRequest
                     {
                         BucketName = s3Settings.Value.BucketName,
                         Key = s3Key,
-                        InputStream = stream,
+                        InputStream = new MemoryStream(fileBytes),
+                        ContentType = file.ContentType,
+                        Metadata = { ["file-name"] = file.FileName },
+                    };
+
+                    var previewPutRequest = new PutObjectRequest()
+                    {
+                        BucketName = s3Settings.Value.BucketName,
+                        Key = previewKey,
+                        InputStream = new MemoryStream(fileBytes),
                         ContentType = file.ContentType,
                         Metadata = { ["file-name"] = file.FileName },
                     };
 
                     await s3Client.PutObjectAsync(putRequest);
+                    await s3Client.PutObjectAsync(previewPutRequest);
+
+                    var signedUrl = s3Client.GeneratePreSignedURL(
+                        s3Settings.Value.BucketName,
+                        previewKey,
+                        DateTime.UtcNow.AddDays(1),
+                        null
+                    );
 
                     var documentRecord = new DocumentRecord
                     {
                         FileName = file.FileName,
                         S3Key = s3Key,
                         UploadedAt = DateTime.UtcNow,
+                        SignedUrl = signedUrl,
                     };
 
                     db.Documents.Add(documentRecord);
                     await db.SaveChangesAsync();
 
-                    return Results.Ok(new UploadResumeResponse { Id = documentRecord.Id });
+                    return Results.Ok(
+                        new DocumentResponse
+                        {
+                            Id = documentRecord.Id,
+                            S3Key = signedUrl,
+                            FileName = file.FileName,
+                            SignedUrl = signedUrl,
+                        }
+                    );
                 }
             )
             .DisableAntiforgery()
-            .Produces<UploadResumeResponse>();
+            .Produces<DocumentResponse>();
+
+        endpoints
+            .MapGet(
+                "resumes/{id:guid}",
+                async (Guid id, AppDbContext db) =>
+                {
+                    var documentRecord = await db.Documents.FindAsync(id);
+                    if (documentRecord == null)
+                    {
+                        return Results.NotFound("Document not found.");
+                    }
+
+                    return Results.Ok(
+                        new DocumentResponse
+                        {
+                            Id = documentRecord.Id,
+                            FileName = documentRecord.FileName,
+                            S3Key = documentRecord.S3Key,
+                            SignedUrl = documentRecord.SignedUrl,
+                        }
+                    );
+                }
+            )
+            .Produces<DocumentResponse>();
 
         endpoints
             .MapPost(
@@ -74,14 +129,12 @@ public static class DocxUploadEndpoints
                     AiService aiService
                 ) =>
                 {
-                    // Retrieve the document record from the database.
                     var documentRecord = await db.Documents.FindAsync(request.Id);
                     if (documentRecord == null)
                     {
                         return Results.NotFound("Document not found.");
                     }
 
-                    // Download the DOCX file from S3 using the S3Key.
                     var getRequest = new GetObjectRequest
                     {
                         BucketName = s3Settings.Value.BucketName,
@@ -121,14 +174,12 @@ public static class DocxUploadEndpoints
                     AppDbContext db
                 ) =>
                 {
-                    // Retrieve the document record from the database.
                     var documentRecord = await db.Documents.FindAsync(request.Id);
                     if (documentRecord == null)
                     {
                         return Results.NotFound("Document not found.");
                     }
 
-                    // Download the DOCX file from S3.
                     var getRequest = new GetObjectRequest
                     {
                         BucketName = s3Settings.Value.BucketName,
@@ -137,7 +188,6 @@ public static class DocxUploadEndpoints
 
                     using var getResponse = await s3Client.GetObjectAsync(getRequest);
 
-                    // Copy the S3 response stream into a MemoryStream for editing.
                     using var s3Stream = new MemoryStream();
                     await getResponse.ResponseStream.CopyToAsync(s3Stream);
                     s3Stream.Position = 0;
@@ -146,20 +196,16 @@ public static class DocxUploadEndpoints
                     await s3Stream.CopyToAsync(editableStream);
                     editableStream.Position = 0;
 
-                    // Open the DOCX for editing.
                     using (var wordDoc = WordprocessingDocument.Open(editableStream, true))
                     {
                         var body = wordDoc.MainDocumentPart.Document.Body;
                         int currentLine = 0;
-
-                        // Loop through every paragraph, run, and text element to update lines that match the recommendations.
                         foreach (var para in body.Elements<Paragraph>())
                         {
                             foreach (var run in para.Elements<Run>())
                             {
                                 foreach (var text in run.Elements<Text>())
                                 {
-                                    // Check if there is a recommendation for the current line.
                                     var recommendation = request.Recommendations.FirstOrDefault(r =>
                                         r.LineNum == currentLine
                                     );
@@ -167,20 +213,15 @@ public static class DocxUploadEndpoints
                                     {
                                         text.Text = recommendation.Text;
                                     }
-
                                     currentLine++;
                                 }
                             }
                         }
-
-                        // Save changes to the document.
                         wordDoc.MainDocumentPart.Document.Save();
                     }
 
-                    // Reset the stream position before returning.
                     editableStream.Position = 0;
 
-                    // Return the updated file.
                     return Results.File(
                         editableStream,
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

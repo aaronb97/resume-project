@@ -9,6 +9,8 @@ import {
 import type {
   PostResumesData,
   PostResumesResponse,
+  GetResumesByIdData,
+  GetResumesByIdResponse,
   PostResumesRecommendData,
   PostResumesRecommendResponse,
   PostResumesProcessRecommendationsData,
@@ -49,6 +51,19 @@ export const postResumes = <ThrowOnError extends boolean = false>(
       "Content-Type": null,
       ...options?.headers,
     },
+  });
+};
+
+export const getResumesById = <ThrowOnError extends boolean = false>(
+  options: Options<GetResumesByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetResumesByIdResponse,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/resumes/{id}",
+    ...options,
   });
 };
 

@@ -5,5 +5,6 @@ public class DocumentRecord
     public Guid Id { get; set; }
     public required string FileName { get; set; }
     public required string S3Key { get; set; }
-    public DateTime UploadedAt { get; set; } 
+    public required string SignedUrl { get; set; } = String.Empty;
+    public DateTime UploadedAt { get; set; }
 }

@@ -6,6 +6,13 @@ export type AiRecommendation = {
   rationale: string;
 };
 
+export type DocumentResponse = {
+  id: string;
+  fileName: string;
+  s3Key: string;
+  signedUrl: string;
+};
+
 export type JobDescriptionRequest = {
   id: string;
   jobDescription: string;
@@ -25,10 +32,6 @@ export type ResumeAiResponse = {
   recommendations: Array<AiRecommendation>;
 };
 
-export type UploadResumeResponse = {
-  id?: string;
-};
-
 export type PostResumesData = {
   body?: {
     file: Blob | File;
@@ -42,11 +45,30 @@ export type PostResumesResponses = {
   /**
    * OK
    */
-  200: UploadResumeResponse;
+  200: DocumentResponse;
 };
 
 export type PostResumesResponse =
   PostResumesResponses[keyof PostResumesResponses];
+
+export type GetResumesByIdData = {
+  body?: never;
+  path: {
+    id: string;
+  };
+  query?: never;
+  url: "/resumes/{id}";
+};
+
+export type GetResumesByIdResponses = {
+  /**
+   * OK
+   */
+  200: DocumentResponse;
+};
+
+export type GetResumesByIdResponse =
+  GetResumesByIdResponses[keyof GetResumesByIdResponses];
 
 export type PostResumesRecommendData = {
   body: JobDescriptionRequest;
