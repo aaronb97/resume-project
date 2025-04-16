@@ -40,19 +40,13 @@ function RouteComponent() {
         return;
       }
 
-      setRecommendations(response.data?.recommendations);
-
       postResumesProcessRecommendations({
         body: {
           id: resumeId,
           recommendations: recommendationsResponse.recommendations,
         },
       }).then(() => {
-        setTimeout(() => {
-          if (iframeRef.current) {
-            iframeRef.current.src += "";
-          }
-        }, 100);
+        setRecommendations(response.data?.recommendations);
       });
     });
   }
@@ -84,11 +78,13 @@ function RouteComponent() {
 
       <div className="w-full flex gap-4 flex-1">
         <div className="flex-1">
-          <iframe
-            ref={iframeRef}
-            className="w-full h-full"
-            src={iframeUrl}
-          ></iframe>
+          {recommendations && (
+            <iframe
+              ref={iframeRef}
+              className="w-full h-full"
+              src={iframeUrl}
+            ></iframe>
+          )}
         </div>
 
         <div className="flex-1">
