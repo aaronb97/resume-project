@@ -85,23 +85,25 @@ function RouteComponent() {
           )}
         </div>
 
-        <div className="flex-1">
-          {recommendations
-            ?.filter((recc) => recc.text)
-            .map((recc) => (
-              <div className="mt-4" key={recc.text}>
-                <p>{recc.text}</p>
-                <p className="text-gray-500 text-xs">{recc.rationale}</p>
-              </div>
-            )) ?? <>Loading your recommendations...</>}
+        <div className="relative h-full flex-1">
+          <div className="overflow-y-auto absolute top-0 bottom-0">
+            {recommendations
+              ?.filter((recc) => recc.text)
+              .map((recc) => (
+                <div className="mt-4" key={recc.text}>
+                  <p>{recc.text}</p>
+                  <p className="text-gray-500 text-xs">{recc.rationale}</p>
+                </div>
+              )) ?? <>Loading your recommendations...</>}
 
-          <Button
-            onClick={() => {
-              getRecommendations();
-            }}
-          >
-            Try Again
-          </Button>
+            <Button
+              onClick={() => {
+                getRecommendations();
+              }}
+            >
+              Try Again
+            </Button>
+          </div>
         </div>
       </div>
     </div>
