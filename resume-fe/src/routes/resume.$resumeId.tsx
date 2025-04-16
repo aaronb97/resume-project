@@ -56,8 +56,6 @@ function RouteComponent() {
     getRecommendations();
   }
 
-  console.log(docData?.signedUrl);
-
   if (!docData) return null;
 
   const iframeUrl = `https://docs.google.com/gview?url=${encodeURIComponent(
@@ -95,7 +93,7 @@ function RouteComponent() {
                 <p>{recc.text}</p>
                 <p className="text-gray-500 text-xs">{recc.rationale}</p>
               </div>
-            )) ?? <>Loading your reccomendations...</>}
+            )) ?? <>Loading your recommendations...</>}
 
           <Button
             onClick={() => {
