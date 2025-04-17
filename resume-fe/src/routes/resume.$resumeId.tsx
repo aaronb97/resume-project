@@ -8,6 +8,7 @@ import {
   postResumesProcessRecommendations,
   postResumesRecommend,
 } from "@/client";
+import { ReccCard } from "@/components/ReccCard";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
@@ -25,6 +26,7 @@ function RouteComponent() {
   };
 
   const [recommendations, setRecommendations] = useState<AiRecommendation[]>();
+  const [activeCard, setActiveCard] = useState(0);
 
   const { data: docData } = useQuery(
     getResumesByIdOptions({ path: { id: resumeId } })
@@ -86,14 +88,16 @@ function RouteComponent() {
         </div>
 
         <div className="relative h-full flex-1">
-          <div className="overflow-y-auto absolute top-0 bottom-0">
+          <div className="overflow-y-auto absolute top-0 bottom-0 flex flex-col gap-2">
             {recommendations
               ?.filter((recc) => recc.text)
-              .map((recc) => (
-                <div className="mt-4" key={recc.text}>
-                  <p>{recc.text}</p>
-                  <p className="text-gray-500 text-xs">{recc.rationale}</p>
-                </div>
+              .map((recc, i) => (
+                <ReccCard
+                  recc={recc}
+                  key={recc.text}
+                  active={activeCard === i}
+                  onMouseEnter={() => setActiveCard(i)}
+                />
               )) ?? <>Loading your recommendations...</>}
 
             <Button
