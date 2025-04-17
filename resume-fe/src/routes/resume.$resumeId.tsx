@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
@@ -18,7 +18,6 @@ let initialProcessed = false;
 
 function RouteComponent() {
   const { resumeId } = Route.useParams();
-  const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const queryOptions = {
@@ -73,16 +72,6 @@ function RouteComponent() {
 
   return (
     <div className="h-full flex flex-col gap-2">
-      <div>
-        <Button
-          onClick={() => {
-            router.navigate({ to: "/upload" });
-          }}
-        >
-          Start over
-        </Button>
-      </div>
-
       <div className="w-full flex gap-4 flex-1">
         <div className="flex-1">
           {recommendations && (
