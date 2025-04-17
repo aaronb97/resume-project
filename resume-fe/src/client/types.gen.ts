@@ -16,6 +16,7 @@ export type DocumentResponse = {
 export type JobDescriptionRequest = {
   id: string;
   jobDescription: string;
+  mockData?: boolean;
 };
 
 export type ProcessRecommendationsRequest = {

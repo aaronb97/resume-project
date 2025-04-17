@@ -129,6 +129,11 @@ public static class DocxUploadEndpoints
                     AiService aiService
                 ) =>
                 {
+                    if (request.MockData)
+                    {
+                        return Results.Ok(MockResumeRecommendations.Response);
+                    }
+
                     var documentRecord = await db.Documents.FindAsync(request.Id);
                     if (documentRecord == null)
                     {
