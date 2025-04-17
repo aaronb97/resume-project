@@ -24,7 +24,7 @@ export function ReccCard({
         onClick={onClick}
         className={clsx(
           "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer rounded-l-lg",
-          included ? "bg-green-600" : "bg-neutral-700"
+          included ? "bg-green-600" : "bg-neutral-800"
         )}
       >
         {included ? (
