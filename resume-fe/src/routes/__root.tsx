@@ -8,7 +8,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <SidebarProvider>
+    <SidebarProvider open={false}>
       <AppSidebar />
 
       <div className="p-2 h-screen w-full">

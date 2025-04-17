@@ -4,6 +4,14 @@ import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { postResumesMutation } from "../client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/upload")({
   component: RouteComponent,
@@ -12,6 +20,9 @@ export const Route = createFileRoute("/upload")({
 function RouteComponent() {
   const postResume = useMutation(postResumesMutation());
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [jobDescription, setJobDescription] = useState("");
+  const [userNotes, setUserNotes] = useState("");
+
   const router = useRouter();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -28,6 +39,19 @@ function RouteComponent() {
         [".docx"],
     },
   });
+
+  const missingResume = !selectedFile;
+  const missingJob = !jobDescription.trim();
+
+  const tooltipMessage = (() => {
+    if (missingResume && missingJob)
+      return "Please add your resume and job description before proceeding.";
+
+    if (missingResume) return "Please add your resume before proceeding.";
+
+    if (missingJob) return "Please add your job description before proceeding.";
+    return "";
+  })();
 
   const handleUpload = () => {
     if (selectedFile) {
@@ -50,32 +74,67 @@ function RouteComponent() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 h-9/10 mt-12">
-      <div
-        {...getRootProps()}
-        className="w-full h-80 flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-5 text-center cursor-pointer"
-      >
-        <input {...getInputProps()} />
+    <div className="flex gap-4 w-full h-full">
+      <div className="flex-1 h-full">
+        <div
+          {...getRootProps()}
+          className="w-full h-full flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-5 text-center cursor-pointer"
+        >
+          <input {...getInputProps()} />
 
-        {isDragActive ? (
-          <p>Drop the file here ...</p>
-        ) : selectedFile ? (
-          <p>Selected file: {selectedFile.name}</p>
-        ) : (
-          <p>Drag and drop a .docx file here, or click to select one</p>
-        )}
+          {isDragActive ? (
+            <p>Drop the file here ...</p>
+          ) : selectedFile ? (
+            <p>Selected file: {selectedFile.name}</p>
+          ) : (
+            <p>Drag and drop a .docx file here, or click to select one</p>
+          )}
+        </div>
       </div>
 
-      {selectedFile && (
-        <Button size={"lg"} onClick={handleUpload}>
-          Upload
-        </Button>
-      )}
+      <div className="flex-1 flex flex-col gap-4">
+        <div className="grid w-full gap-1.5">
+          <Label>Job Description</Label>
 
-      {postResume.isPending && <p>Uploading...</p>}
-      {postResume.error && <p>Error uploading file.</p>}
-      {postResume.isSuccess && <p>Upload successful!</p>}
-      {postResume.data && <p>{postResume.data.id}</p>}
+          <Textarea
+            placeholder="Enter the job description you would like to fine tune your resume towards"
+            id="jobDescription"
+            onChange={(e) => setJobDescription(e.target.value)}
+          />
+        </div>
+
+        <div className="grid w-full gap-1.5">
+          <Label>User Notes (optional)</Label>
+
+          <Textarea
+            placeholder="Please enter anything else you would like the AI to know"
+            id="userNotes"
+            onChange={(e) => setUserNotes(e.target.value)}
+          />
+        </div>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Button
+                  size="lg"
+                  onClick={handleUpload}
+                  disabled={!!tooltipMessage}
+                  type="button"
+                  className="w-full"
+                >
+                  Optimize Your Resume
+                </Button>
+              </div>
+            </TooltipTrigger>
+
+            {tooltipMessage && (
+              <TooltipContent side="bottom">{tooltipMessage}</TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+      </div>
     </div>
   );
 }
