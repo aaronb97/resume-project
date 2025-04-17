@@ -43,7 +43,8 @@ Do not change tools used in an achievement, the rewording must not lie.
 Do not excessively summarize sentences. 
 Focus on rewording achievements to job terms used in the job description without changing original meaning.
 For each line given, alter the text to better match the job description. 
-Match punctuation of the original line. 
+Match punctuation of the original line. Lines that do not end in a period should not be altered to have a period.
+Only include changes that are significant improvement to the line. Do not include slight rewordings. 
 'Rationale' should indicate how the change helps match the resume to the job description.
 The rationale must quote exact words mentioned in the job description. Do not hallucinate.
 
