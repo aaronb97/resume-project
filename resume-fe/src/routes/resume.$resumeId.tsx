@@ -4,11 +4,11 @@ import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import {
-  AiRecommendation,
   postResumesProcessRecommendations,
   postResumesRecommend,
 } from "@/client";
 import { ReccCard } from "@/components/ReccCard";
+import { AiRecommendationExtended } from "@/types/AiRecommendationExtended";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
@@ -25,32 +25,39 @@ function RouteComponent() {
     body: { id: resumeId, jobDescription: "Senior developer" },
   };
 
-  const [recommendations, setRecommendations] = useState<AiRecommendation[]>();
+  const [recommendations, setRecommendations] =
+    useState<AiRecommendationExtended[]>();
+
   const [activeCard, setActiveCard] = useState(0);
 
   const { data: docData } = useQuery(
     getResumesByIdOptions({ path: { id: resumeId } })
   );
 
-  function getRecommendations() {
+  async function getRecommendations() {
     setRecommendations(undefined);
 
-    postResumesRecommend(queryOptions).then((response) => {
-      const recommendationsResponse = response.data;
-      if (!recommendationsResponse) {
-        alert("failed to get recs");
-        return;
-      }
+    const response = await postResumesRecommend(queryOptions);
+    const recommendationsResponse = response.data;
 
-      postResumesProcessRecommendations({
-        body: {
-          id: resumeId,
-          recommendations: recommendationsResponse.recommendations,
-        },
-      }).then(() => {
-        setRecommendations(response.data?.recommendations);
-      });
+    if (!recommendationsResponse) {
+      alert("failed to get recs");
+      return;
+    }
+
+    await postResumesProcessRecommendations({
+      body: {
+        id: resumeId,
+        recommendations: recommendationsResponse.recommendations,
+      },
     });
+
+    setRecommendations(
+      recommendationsResponse.recommendations.map((recc) => ({
+        ...recc,
+        included: true,
+      }))
+    );
   }
 
   if (!initialProcessed) {
@@ -93,6 +100,19 @@ function RouteComponent() {
               ?.filter((recc) => recc.text)
               .map((recc, i) => (
                 <ReccCard
+                  onClick={() => {
+                    setRecommendations(
+                      recommendations.map((nextRecc) => {
+                        if (nextRecc.lineNum !== recc.lineNum) return nextRecc;
+
+                        return {
+                          ...nextRecc,
+                          included: !nextRecc.included,
+                        };
+                      })
+                    );
+                  }}
+                  included={recc.included}
                   recc={recc}
                   key={recc.text}
                   active={activeCard === i}

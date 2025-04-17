@@ -1,19 +1,49 @@
+import { Check, X } from "lucide-react";
+import clsx from "clsx";
+import React from "react";
 import { AiRecommendation } from "@/client";
-import { Card, CardContent } from "./ui/card";
 
-interface Props {
+export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   recc: AiRecommendation;
   active: boolean;
-  onMouseEnter: () => void;
-}
+  included: boolean;
+  onClick: () => void;
+};
 
-export function ReccCard({ recc, active, onMouseEnter }: Props) {
+export function ReccCard({
+  recc,
+  included,
+  className,
+  onClick,
+  ...props
+}: CardProps) {
   return (
-    <Card>
-      <CardContent onMouseEnter={onMouseEnter}>
-        <p>{recc.text}</p>
-        {active && <p className="text-gray-500 text-xs">{recc.rationale}</p>}
-      </CardContent>
-    </Card>
+    <div
+      {...props}
+      className={clsx(
+        "flex items-stretch rounded-lg shadow-sm border border-gray-400 bg-neutral-900 overflow-hidden",
+        className
+      )}
+    >
+      <button
+        type="button"
+        onClick={onClick}
+        className={clsx(
+          "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer",
+          included ? "bg-green-600" : "bg-neutral-700"
+        )}
+      >
+        {included ? (
+          <Check className="w-4 h-4 text-white" />
+        ) : (
+          <X className="w-4 h-4 text-white" />
+        )}
+      </button>
+
+      <div className="flex flex-col p-4">
+        <span className="font-medium">{recc.text}</span>
+        <span className="mt-1 text-xs text-neutral-400">{recc.rationale}</span>
+      </div>
+    </div>
   );
 }
