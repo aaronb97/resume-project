@@ -18,18 +18,12 @@ export function ReccCard({
   ...props
 }: CardProps) {
   return (
-    <div
-      {...props}
-      className={clsx(
-        "flex items-stretch rounded-lg shadow-sm border border-gray-400 bg-neutral-900 overflow-hidden",
-        className
-      )}
-    >
+    <div {...props} className={clsx("flex w-full", className)}>
       <button
         type="button"
         onClick={onClick}
         className={clsx(
-          "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer",
+          "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer rounded-l-lg",
           included ? "bg-green-600" : "bg-neutral-700"
         )}
       >
@@ -40,7 +34,7 @@ export function ReccCard({
         )}
       </button>
 
-      <div className="flex flex-col p-4">
+      <div className="flex flex-col p-4 border-1 border-l-0 rounded-r-lg border-neutral-800 w-9/10">
         <span className="font-medium">{recc.text}</span>
         <span className="mt-1 text-xs text-neutral-400">{recc.rationale}</span>
       </div>

@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
-import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import {
   postResumesProcessRecommendations,
@@ -9,6 +8,9 @@ import {
 } from "@/client";
 import { ReccCard } from "@/components/ReccCard";
 import { AiRecommendationExtended } from "@/types/AiRecommendationExtended";
+import { ResumeActions } from "@/components/ResumeActions";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { RefreshCw, Upload } from "lucide-react";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
@@ -20,9 +22,7 @@ function RouteComponent() {
   const { resumeId } = Route.useParams();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  const queryOptions = {
-    body: { id: resumeId, jobDescription: "Senior developer" },
-  };
+  const { useMockData } = useSettingsStore();
 
   const [recommendations, setRecommendations] =
     useState<AiRecommendationExtended[]>();
@@ -36,7 +36,14 @@ function RouteComponent() {
   async function getRecommendations() {
     setRecommendations(undefined);
 
-    const response = await postResumesRecommend(queryOptions);
+    const response = await postResumesRecommend({
+      body: {
+        id: resumeId,
+        jobDescription: "Senior developer",
+        mockData: useMockData,
+      },
+    });
+
     const recommendationsResponse = response.data;
 
     if (!recommendationsResponse) {
@@ -71,7 +78,7 @@ function RouteComponent() {
   )}&embedded=true`;
 
   return (
-    <div className="h-full flex flex-col gap-2">
+    <div className="flex-1 flex flex-col gap-2">
       <div className="w-full flex gap-4 flex-1">
         <div className="flex-1">
           {recommendations && (
@@ -83,39 +90,49 @@ function RouteComponent() {
           )}
         </div>
 
-        <div className="relative h-full flex-1">
-          <div className="overflow-y-auto absolute top-0 bottom-0 flex flex-col gap-2">
-            {recommendations
-              ?.filter((recc) => recc.text)
-              .map((recc, i) => (
-                <ReccCard
-                  onClick={() => {
-                    setRecommendations(
-                      recommendations.map((nextRecc) => {
-                        if (nextRecc.lineNum !== recc.lineNum) return nextRecc;
+        <div className="flex-1 flex flex-col gap-1">
+          <ResumeActions
+            items={[
+              {
+                title: "Upload Another Resume",
+                to: "/upload",
+                icon: Upload,
+              },
+              {
+                title: "Regenerate Recommendations",
+                icon: RefreshCw,
+                onClick: getRecommendations,
+              },
+            ]}
+          />
 
-                        return {
-                          ...nextRecc,
-                          included: !nextRecc.included,
-                        };
-                      })
-                    );
-                  }}
-                  included={recc.included}
-                  recc={recc}
-                  key={recc.text}
-                  active={activeCard === i}
-                  onMouseEnter={() => setActiveCard(i)}
-                />
-              )) ?? <>Loading your recommendations...</>}
+          <div className="relative w-full flex-1">
+            <div className="overflow-y-auto absolute top-0 bottom-0 flex flex-col gap-2 w-full">
+              {recommendations
+                ?.filter((recc) => recc.text)
+                .map((recc, i) => (
+                  <ReccCard
+                    onClick={() => {
+                      setRecommendations(
+                        recommendations.map((nextRecc) => {
+                          if (nextRecc.lineNum !== recc.lineNum)
+                            return nextRecc;
 
-            <Button
-              onClick={() => {
-                getRecommendations();
-              }}
-            >
-              Try Again
-            </Button>
+                          return {
+                            ...nextRecc,
+                            included: !nextRecc.included,
+                          };
+                        })
+                      );
+                    }}
+                    included={recc.included}
+                    recc={recc}
+                    key={recc.text}
+                    active={activeCard === i}
+                    onMouseEnter={() => setActiveCard(i)}
+                  />
+                )) ?? <>Loading your recommendations...</>}
+            </div>
           </div>
         </div>
       </div>

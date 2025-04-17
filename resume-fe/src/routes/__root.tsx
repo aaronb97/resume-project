@@ -1,6 +1,5 @@
+import { TopBar } from "@/components/TopBar";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -8,12 +7,12 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <SidebarProvider open={false}>
-      <AppSidebar />
+    <div className="flex flex-col h-screen">
+      <TopBar />
 
-      <div className="p-2 h-screen w-full">
+      <div className="flex-1 p-2 overflow-auto flex mt-2">
         <Outlet />
       </div>
-    </SidebarProvider>
+    </div>
   );
 }

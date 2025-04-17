@@ -74,22 +74,20 @@ function RouteComponent() {
   };
 
   return (
-    <div className="flex gap-4 w-full h-full">
-      <div className="flex-1 h-full">
-        <div
-          {...getRootProps()}
-          className="w-full h-full flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-5 text-center cursor-pointer"
-        >
-          <input {...getInputProps()} />
+    <div className="flex gap-4 w-full flex-1">
+      <div
+        {...getRootProps()}
+        className="w-full flex-1 flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
+      >
+        <input {...getInputProps()} />
 
-          {isDragActive ? (
-            <p>Drop the file here ...</p>
-          ) : selectedFile ? (
-            <p>Selected file: {selectedFile.name}</p>
-          ) : (
-            <p>Drag and drop a .docx file here, or click to select one</p>
-          )}
-        </div>
+        {isDragActive ? (
+          <p>Drop the file here ...</p>
+        ) : selectedFile ? (
+          <p>Selected file: {selectedFile.name}</p>
+        ) : (
+          <p>Drag and drop a .docx file here, or click to select one</p>
+        )}
       </div>
 
       <div className="flex-1 flex flex-col gap-4">
