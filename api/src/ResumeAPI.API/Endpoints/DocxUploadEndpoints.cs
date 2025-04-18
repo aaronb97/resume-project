@@ -2,6 +2,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using ResumeAPI.Models;
 using ResumeAPI.Services;
@@ -18,6 +19,8 @@ public static class DocxUploadEndpoints
                 "resumes",
                 async (
                     IFormFile file,
+                    [FromForm] string jobDescription,
+                    [FromForm] string? userNotes,
                     IAmazonS3 s3Client,
                     IOptions<S3Settings> s3Settings,
                     AppDbContext db
@@ -26,6 +29,11 @@ public static class DocxUploadEndpoints
                     if (file.Length == 0)
                     {
                         return Results.BadRequest("No file uploaded.");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(jobDescription))
+                    {
+                        return Results.BadRequest("Job description is required.");
                     }
 
                     if (Path.GetExtension(file.FileName)?.ToLower() != ".docx")
@@ -50,7 +58,7 @@ public static class DocxUploadEndpoints
                         Metadata = { ["file-name"] = file.FileName },
                     };
 
-                    var previewPutRequest = new PutObjectRequest()
+                    var previewPutRequest = new PutObjectRequest
                     {
                         BucketName = s3Settings.Value.BucketName,
                         Key = previewKey,
@@ -75,6 +83,8 @@ public static class DocxUploadEndpoints
                         S3Key = s3Key,
                         UploadedAt = DateTime.UtcNow,
                         SignedUrl = signedUrl,
+                        JobDescription = jobDescription,
+                        UserNotes = userNotes ?? "",
                     };
 
                     db.Documents.Add(documentRecord);
@@ -84,9 +94,11 @@ public static class DocxUploadEndpoints
                         new DocumentResponse
                         {
                             Id = documentRecord.Id,
-                            S3Key = signedUrl,
+                            S3Key = s3Key,
                             FileName = file.FileName,
                             SignedUrl = signedUrl,
+                            JobDescription = jobDescription,
+                            UserNotes = userNotes ?? "",
                         }
                     );
                 }
@@ -112,6 +124,8 @@ public static class DocxUploadEndpoints
                             FileName = documentRecord.FileName,
                             S3Key = documentRecord.S3Key,
                             SignedUrl = documentRecord.SignedUrl,
+                            JobDescription = documentRecord.JobDescription,
+                            UserNotes = documentRecord.UserNotes,
                         }
                     );
                 }
@@ -122,7 +136,7 @@ public static class DocxUploadEndpoints
             .MapPost(
                 "resumes/recommend",
                 async (
-                    JobDescriptionRequest request,
+                    GenerateRecommendationsRequest request,
                     IAmazonS3 s3Client,
                     IOptions<S3Settings> s3Settings,
                     AppDbContext db,
@@ -159,8 +173,9 @@ public static class DocxUploadEndpoints
                     using var wordDoc = WordprocessingDocument.Open(editableStream, true);
 
                     var recommendations = await aiService.GetRecommendations(
-                        request.JobDescription,
-                        wordDoc.GetResumeText()
+                        jobDescription: request.JobDescription,
+                        userNotes: request.UserNotes,
+                        resume: wordDoc.GetResumeText()
                     );
 
                     return Results.Ok(recommendations);

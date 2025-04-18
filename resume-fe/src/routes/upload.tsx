@@ -56,7 +56,7 @@ function RouteComponent() {
   const handleUpload = () => {
     if (selectedFile) {
       postResume.mutate(
-        { body: { file: selectedFile } },
+        { body: { file: selectedFile, jobDescription, userNotes } },
         {
           onSuccess: (data) => {
             if (data.id) {

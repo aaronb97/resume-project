@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
 import { useRef, useState } from "react";
 import {
+  DocumentResponse,
   postResumesProcessRecommendations,
   postResumesRecommend,
 } from "@/client";
@@ -33,13 +34,16 @@ function RouteComponent() {
     getResumesByIdOptions({ path: { id: resumeId } })
   );
 
-  async function getRecommendations() {
+  async function getRecommendations(
+    getRecommendationsDocData: DocumentResponse
+  ) {
     setRecommendations(undefined);
 
     const response = await postResumesRecommend({
       body: {
         id: resumeId,
-        jobDescription: "Senior developer",
+        jobDescription: getRecommendationsDocData.jobDescription,
+        userNotes: getRecommendationsDocData.userNotes,
         mockData: useMockData,
       },
     });
@@ -66,12 +70,12 @@ function RouteComponent() {
     );
   }
 
+  if (!docData) return null;
+
   if (!initialProcessed) {
     initialProcessed = true;
-    getRecommendations();
+    getRecommendations(docData);
   }
-
-  if (!docData) return null;
 
   const iframeUrl = `https://docs.google.com/gview?url=${encodeURIComponent(
     docData.signedUrl
@@ -101,7 +105,7 @@ function RouteComponent() {
               {
                 title: "Regenerate Recommendations",
                 icon: RefreshCw,
-                onClick: getRecommendations,
+                onClick: () => getRecommendations(docData),
               },
             ]}
           />

@@ -23,7 +23,11 @@ public class AiService
             .Build();
     }
 
-    public async Task<ResumeAiResponse> GetRecommendations(string jobDescription, string resume)
+    public async Task<ResumeAiResponse> GetRecommendations(
+        string jobDescription,
+        string userNotes,
+        string resume
+    )
     {
         var executionSettings = new OpenAIPromptExecutionSettings()
         {
@@ -62,6 +66,18 @@ START RESUME:
 {resume}
 
 END RESUME";
+
+        if (!string.IsNullOrEmpty(userNotes))
+        {
+            prompt +=
+                @$" 
+ADDITIONAL USER NOTES:
+
+{userNotes}
+
+END ADDITIONAL USER NOTES
+";
+        }
 
         var result = await _kernel.InvokePromptAsync(prompt, new(executionSettings));
 

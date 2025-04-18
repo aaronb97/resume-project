@@ -11,11 +11,14 @@ export type DocumentResponse = {
   fileName: string;
   s3Key: string;
   signedUrl: string;
+  jobDescription: string;
+  userNotes: string;
 };
 
-export type JobDescriptionRequest = {
+export type GenerateRecommendationsRequest = {
   id: string;
   jobDescription: string;
+  userNotes: string;
   mockData?: boolean;
 };
 
@@ -36,6 +39,8 @@ export type ResumeAiResponse = {
 export type PostResumesData = {
   body?: {
     file: Blob | File;
+    jobDescription: string;
+    userNotes?: string;
   };
   path?: never;
   query?: never;
@@ -72,7 +77,7 @@ export type GetResumesByIdResponse =
   GetResumesByIdResponses[keyof GetResumesByIdResponses];
 
 export type PostResumesRecommendData = {
-  body: JobDescriptionRequest;
+  body: GenerateRecommendationsRequest;
   path?: never;
   query?: never;
   url: "/resumes/recommend";
