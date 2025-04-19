@@ -123,11 +123,13 @@ function RouteComponent() {
                 <Button
                   size="lg"
                   onClick={handleUpload}
-                  disabled={!!tooltipMessage}
+                  disabled={!!tooltipMessage || postResume.isPending}
                   type="button"
                   className="w-full"
                 >
-                  Optimize Your Resume
+                  {postResume.isPending
+                    ? "Uploading..."
+                    : "Optimize Your Resume"}
                 </Button>
               </div>
             </TooltipTrigger>
