@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
 import { useRef, useState } from "react";
 import {
+  AiRecommendation,
   DocumentResponse,
   postResumesProcessRecommendations,
   postResumesRecommend,
@@ -30,10 +31,26 @@ function RouteComponent() {
     useState<AiRecommendationExtended[]>();
 
   const [activeCard, setActiveCard] = useState(0);
+  const [isStale, setIsStale] = useState(false);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
   const { data: docData } = useQuery(
     getResumesByIdOptions({ path: { id: resumeId } })
   );
+
+  async function applyRecommendations(recommendations: AiRecommendation[]) {
+    setIsLoadingPreview(true);
+
+    await postResumesProcessRecommendations({
+      body: {
+        id: resumeId,
+        recommendations,
+      },
+    });
+
+    setIsLoadingPreview(false);
+    setIsStale(false);
+  }
 
   async function getRecommendations(
     getRecommendationsDocData: DocumentResponse
@@ -56,12 +73,7 @@ function RouteComponent() {
       return;
     }
 
-    await postResumesProcessRecommendations({
-      body: {
-        id: resumeId,
-        recommendations: recommendationsResponse.recommendations,
-      },
-    });
+    await applyRecommendations(recommendationsResponse.recommendations);
 
     setRecommendations(
       recommendationsResponse.recommendations.map((recc) => ({
@@ -88,18 +100,35 @@ function RouteComponent() {
         <div className="flex-1 flex flex-col gap-2 items-center">
           {recommendations && (
             <>
-              <iframe
-                ref={iframeRef}
-                className="w-full h-full"
-                src={iframeUrl}
-              ></iframe>
+              {isLoadingPreview ? (
+                <div className="h-full">Loading preview...</div>
+              ) : (
+                <iframe
+                  ref={iframeRef}
+                  className="w-full h-full"
+                  src={iframeUrl}
+                ></iframe>
+              )}
 
-              <Button asChild className="w-36">
-                <a href={docData.signedUrl} download="Your Optimized Resume">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download
-                </a>
-              </Button>
+              {isStale ? (
+                <Button
+                  onClick={() =>
+                    applyRecommendations(
+                      recommendations.filter((recc) => recc.included)
+                    )
+                  }
+                  disabled={isLoadingPreview}
+                >
+                  <RefreshCw /> Regenerate Preview
+                </Button>
+              ) : (
+                <Button asChild className="w-36">
+                  <a href={docData.signedUrl} download="Your Optimized Resume">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                  </a>
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -127,6 +156,8 @@ function RouteComponent() {
                 .map((recc, i) => (
                   <ReccCard
                     onClick={() => {
+                      setIsStale(true);
+
                       setRecommendations(
                         recommendations.map((nextRecc) => {
                           if (nextRecc.lineNum !== recc.lineNum)
