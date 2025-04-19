@@ -14,12 +14,11 @@ import { Download, FileText, RefreshCw, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobDescriptionUserNotesDialog } from "@/components/JobDescriptionUserNotesDialog";
 import { IconTooltipButton } from "@/components/IconTooltipButton";
+import { useMount } from "@/lib/useMount";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
 });
-
-let initialProcessed = false;
 
 function RouteComponent() {
   const { resumeId } = Route.useParams();
@@ -37,6 +36,10 @@ function RouteComponent() {
   const { data: docData } = useQuery(
     getResumesByIdOptions({ path: { id: resumeId } })
   );
+
+  useMount(() => {
+    getRecommendations();
+  });
 
   async function applyRecommendations(recommendations: AiRecommendation[]) {
     setIsLoadingPreview(true);
@@ -80,11 +83,6 @@ function RouteComponent() {
   }
 
   if (!docData) return null;
-
-  if (!initialProcessed) {
-    initialProcessed = true;
-    getRecommendations();
-  }
 
   const iframeUrl = `https://docs.google.com/gview?url=${encodeURIComponent(
     docData.signedUrl
