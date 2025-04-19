@@ -5,7 +5,7 @@ export function TopBar() {
   const { useMockData, toggleMockData } = useSettingsStore();
 
   return (
-    <header className="flex items-center justify-between h-12 w-full border-b bg-neutral-900 px-4">
+    <header className="flex items-center justify-between h-12 w-full border-b bg-stone-900 px-4">
       <h1 className="text-sm font-semibold select-none">My App</h1>
 
       <div className="flex items-center gap-2">

@@ -111,7 +111,7 @@ function RouteComponent() {
   return (
     <div className="flex-1 flex flex-col gap-2">
       <div className="w-full flex gap-4 flex-1">
-        <div className="flex-1 flex flex-col gap-2 items-center">
+        <div className="flex-1 flex flex-col gap-2 items-center bg-stone-900/50 rounded-lg p-4 border">
           {recommendations && (
             <>
               {isLoadingPreview ? (
@@ -147,7 +147,7 @@ function RouteComponent() {
           )}
         </div>
 
-        <div className="flex-1 flex flex-col gap-1">
+        <div className="flex-1 flex flex-col gap-1 bg-stone-900/50 rounded-2xl px-4 py-2 border-1">
           <div className="flex gap-2">
             {actions.map(({ label, icon, ...rest }) => (
               <IconTooltipButton

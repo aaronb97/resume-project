@@ -34,7 +34,7 @@ export function ReccCard({
         )}
       </button>
 
-      <div className="flex flex-col p-4 border-1 border-l-0 rounded-r-lg bg-card w-9/10">
+      <div className="flex flex-col p-4 border-1 border-l-0 rounded-r-lg bg-stone-900 w-full">
         <span className="font-medium">{recc.text}</span>
         <span className="mt-1 text-xs text-neutral-400">{recc.rationale}</span>
       </div>
