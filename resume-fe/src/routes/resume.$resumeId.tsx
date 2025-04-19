@@ -10,10 +10,11 @@ import {
 } from "@/client";
 import { ReccCard } from "@/components/ReccCard";
 import { AiRecommendationExtended } from "@/types/AiRecommendationExtended";
-import { ResumeActions } from "@/components/ResumeActions";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { Download, RefreshCw, Upload } from "lucide-react";
+import { Download, FileText, RefreshCw, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { JobDescriptionUserNotesDialog } from "@/components/JobDescriptionUserNotesDialog";
+import { IconTooltipButton } from "@/components/IconTooltipButton";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
@@ -29,10 +30,10 @@ function RouteComponent() {
 
   const [recommendations, setRecommendations] =
     useState<AiRecommendationExtended[]>();
-
   const [activeCard, setActiveCard] = useState(0);
   const [isStale, setIsStale] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const { data: docData } = useQuery(
     getResumesByIdOptions({ path: { id: resumeId } })
@@ -94,6 +95,24 @@ function RouteComponent() {
     docData.signedUrl
   )}&embedded=true`;
 
+  const actions = [
+    {
+      label: "Upload Another Resume",
+      icon: Upload,
+      to: "/upload",
+    },
+    {
+      label: "Regenerate Recommendations",
+      icon: RefreshCw,
+      onClick: () => getRecommendations(docData),
+    },
+    {
+      label: "Update Job Description / User Notes",
+      icon: FileText,
+      onClick: () => setOpenDialog(true),
+    },
+  ] as const;
+
   return (
     <div className="flex-1 flex flex-col gap-2">
       <div className="w-full flex gap-4 flex-1">
@@ -134,20 +153,16 @@ function RouteComponent() {
         </div>
 
         <div className="flex-1 flex flex-col gap-1">
-          <ResumeActions
-            items={[
-              {
-                title: "Upload Another Resume",
-                to: "/upload",
-                icon: Upload,
-              },
-              {
-                title: "Regenerate Recommendations",
-                icon: RefreshCw,
-                onClick: () => getRecommendations(docData),
-              },
-            ]}
-          />
+          <div className="flex gap-2">
+            {actions.map(({ label, icon, ...rest }) => (
+              <IconTooltipButton
+                key={label}
+                label={label}
+                icon={icon}
+                {...rest}
+              />
+            ))}
+          </div>
 
           <div className="relative w-full flex-1">
             <div className="overflow-y-auto absolute top-0 bottom-0 flex flex-col gap-2 w-full">
@@ -181,6 +196,11 @@ function RouteComponent() {
           </div>
         </div>
       </div>
+
+      <JobDescriptionUserNotesDialog
+        open={openDialog}
+        onOpenChange={() => setOpenDialog(false)}
+      />
     </div>
   );
 }
