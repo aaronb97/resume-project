@@ -4,7 +4,6 @@ import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
 import { useRef, useState } from "react";
 import {
   AiRecommendation,
-  DocumentResponse,
   postResumesProcessRecommendations,
   postResumesRecommend,
 } from "@/client";
@@ -53,16 +52,12 @@ function RouteComponent() {
     setIsStale(false);
   }
 
-  async function getRecommendations(
-    getRecommendationsDocData: DocumentResponse
-  ) {
+  async function getRecommendations() {
     setRecommendations(undefined);
 
     const response = await postResumesRecommend({
       body: {
         id: resumeId,
-        jobDescription: getRecommendationsDocData.jobDescription,
-        userNotes: getRecommendationsDocData.userNotes,
         mockData: useMockData,
       },
     });
@@ -88,7 +83,7 @@ function RouteComponent() {
 
   if (!initialProcessed) {
     initialProcessed = true;
-    getRecommendations(docData);
+    getRecommendations();
   }
 
   const iframeUrl = `https://docs.google.com/gview?url=${encodeURIComponent(
@@ -104,7 +99,7 @@ function RouteComponent() {
     {
       label: "Regenerate Recommendations",
       icon: RefreshCw,
-      onClick: () => getRecommendations(docData),
+      onClick: () => getRecommendations(),
     },
     {
       label: "Update Job Description / User Notes",
@@ -200,6 +195,10 @@ function RouteComponent() {
       <JobDescriptionUserNotesDialog
         open={openDialog}
         onOpenChange={() => setOpenDialog(false)}
+        onSave={() => {
+          setOpenDialog(false);
+          getRecommendations();
+        }}
       />
     </div>
   );

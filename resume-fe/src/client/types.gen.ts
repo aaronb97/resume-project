@@ -17,8 +17,6 @@ export type DocumentResponse = {
 
 export type GenerateRecommendationsRequest = {
   id: string;
-  jobDescription: string;
-  userNotes: string;
   mockData?: boolean;
 };
 
@@ -34,6 +32,11 @@ export type RecommendationToProcess = {
 
 export type ResumeAiResponse = {
   recommendations: Array<AiRecommendation>;
+};
+
+export type UpdateDocumentRequest = {
+  jobDescription?: string | null;
+  userNotes?: string | null;
 };
 
 export type PostResumesData = {
@@ -75,6 +78,25 @@ export type GetResumesByIdResponses = {
 
 export type GetResumesByIdResponse =
   GetResumesByIdResponses[keyof GetResumesByIdResponses];
+
+export type PatchResumesByIdData = {
+  body: UpdateDocumentRequest;
+  path: {
+    id: string;
+  };
+  query?: never;
+  url: "/resumes/{id}";
+};
+
+export type PatchResumesByIdResponses = {
+  /**
+   * OK
+   */
+  200: DocumentResponse;
+};
+
+export type PatchResumesByIdResponse =
+  PatchResumesByIdResponses[keyof PatchResumesByIdResponses];
 
 export type PostResumesRecommendData = {
   body: GenerateRecommendationsRequest;

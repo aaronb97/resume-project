@@ -11,6 +11,8 @@ import type {
   PostResumesResponse,
   GetResumesByIdData,
   GetResumesByIdResponse,
+  PatchResumesByIdData,
+  PatchResumesByIdResponse,
   PostResumesRecommendData,
   PostResumesRecommendResponse,
   PostResumesProcessRecommendationsData,
@@ -65,6 +67,23 @@ export const getResumesById = <ThrowOnError extends boolean = false>(
   >({
     url: "/resumes/{id}",
     ...options,
+  });
+};
+
+export const patchResumesById = <ThrowOnError extends boolean = false>(
+  options: Options<PatchResumesByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? _heyApiClient).patch<
+    PatchResumesByIdResponse,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/resumes/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
   });
 };
 

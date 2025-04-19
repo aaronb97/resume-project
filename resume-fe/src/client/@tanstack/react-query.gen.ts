@@ -4,6 +4,7 @@ import {
   type Options,
   postResumes,
   getResumesById,
+  patchResumesById,
   postResumesRecommend,
   postResumesProcessRecommendations,
   get,
@@ -17,6 +18,8 @@ import type {
   PostResumesData,
   PostResumesResponse,
   GetResumesByIdData,
+  PatchResumesByIdData,
+  PatchResumesByIdResponse,
   PostResumesRecommendData,
   PostResumesRecommendResponse,
   PostResumesProcessRecommendationsData,
@@ -113,6 +116,26 @@ export const getResumesByIdOptions = (options: Options<GetResumesByIdData>) => {
     },
     queryKey: getResumesByIdQueryKey(options),
   });
+};
+
+export const patchResumesByIdMutation = (
+  options?: Partial<Options<PatchResumesByIdData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PatchResumesByIdResponse,
+    DefaultError,
+    Options<PatchResumesByIdData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await patchResumesById({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const postResumesRecommendQueryKey = (

@@ -133,6 +133,45 @@ public static class DocxUploadEndpoints
             .Produces<DocumentResponse>();
 
         endpoints
+            .MapPatch(
+                "resumes/{id:guid}",
+                async (Guid id, UpdateDocumentRequest request, AppDbContext db) =>
+                {
+                    var documentRecord = await db.Documents.FindAsync(id);
+                    if (documentRecord == null)
+                    {
+                        return Results.NotFound("Document not found.");
+                    }
+
+                    if (request.JobDescription is not null)
+                    {
+                        documentRecord.JobDescription = request.JobDescription;
+                    }
+
+                    if (request.UserNotes is not null)
+                    {
+                        documentRecord.UserNotes = request.UserNotes;
+                    }
+
+                    await db.SaveChangesAsync();
+
+                    return Results.Ok(
+                        new DocumentResponse
+                        {
+                            Id = documentRecord.Id,
+                            FileName = documentRecord.FileName,
+                            S3Key = documentRecord.S3Key,
+                            SignedUrl = documentRecord.SignedUrl,
+                            JobDescription = documentRecord.JobDescription,
+                            UserNotes = documentRecord.UserNotes,
+                        }
+                    );
+                }
+            )
+            .DisableAntiforgery()
+            .Produces<DocumentResponse>();
+
+        endpoints
             .MapPost(
                 "resumes/recommend",
                 async (
@@ -173,8 +212,8 @@ public static class DocxUploadEndpoints
                     using var wordDoc = WordprocessingDocument.Open(editableStream, true);
 
                     var recommendations = await aiService.GetRecommendations(
-                        jobDescription: request.JobDescription,
-                        userNotes: request.UserNotes,
+                        jobDescription: documentRecord.JobDescription,
+                        userNotes: documentRecord.UserNotes,
                         resume: wordDoc.GetResumeText()
                     );
 
