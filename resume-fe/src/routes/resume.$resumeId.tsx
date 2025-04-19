@@ -11,7 +11,8 @@ import { ReccCard } from "@/components/ReccCard";
 import { AiRecommendationExtended } from "@/types/AiRecommendationExtended";
 import { ResumeActions } from "@/components/ResumeActions";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { RefreshCw, Upload } from "lucide-react";
+import { Download, RefreshCw, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
@@ -84,13 +85,22 @@ function RouteComponent() {
   return (
     <div className="flex-1 flex flex-col gap-2">
       <div className="w-full flex gap-4 flex-1">
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col gap-2 items-center">
           {recommendations && (
-            <iframe
-              ref={iframeRef}
-              className="w-full h-full"
-              src={iframeUrl}
-            ></iframe>
+            <>
+              <iframe
+                ref={iframeRef}
+                className="w-full h-full"
+                src={iframeUrl}
+              ></iframe>
+
+              <Button asChild className="w-36">
+                <a href={docData.signedUrl} download="Your Optimized Resume">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </a>
+              </Button>
+            </>
           )}
         </div>
 
