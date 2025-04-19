@@ -24,7 +24,7 @@ export function ReccCard({
         onClick={onClick}
         className={clsx(
           "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer rounded-l-lg",
-          included ? "bg-green-600" : "bg-neutral-800"
+          included ? "bg-emerald-500" : "bg-neutral-800"
         )}
       >
         {included ? (
@@ -34,7 +34,7 @@ export function ReccCard({
         )}
       </button>
 
-      <div className="flex flex-col p-4 border-1 border-l-0 rounded-r-lg border-neutral-800 w-9/10">
+      <div className="flex flex-col p-4 border-1 border-l-0 rounded-r-lg bg-card w-9/10">
         <span className="font-medium">{recc.text}</span>
         <span className="mt-1 text-xs text-neutral-400">{recc.rationale}</span>
       </div>
