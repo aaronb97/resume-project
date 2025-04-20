@@ -124,6 +124,7 @@ function RouteComponent() {
 
               {isStale ? (
                 <Button
+                  variant="secondary"
                   onClick={() =>
                     applyRecommendations(
                       recommendations.filter((recc) => recc.included)
@@ -134,7 +135,7 @@ function RouteComponent() {
                   <RefreshCw /> Regenerate Preview
                 </Button>
               ) : (
-                <Button asChild className="w-36">
+                <Button asChild className="w-36" variant="secondary">
                   <a href={docData.signedUrl} download="Your Optimized Resume">
                     <Download className="mr-2 h-4 w-4" />
                     Download
