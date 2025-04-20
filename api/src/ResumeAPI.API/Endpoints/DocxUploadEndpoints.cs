@@ -172,22 +172,23 @@ public static class DocxUploadEndpoints
             .Produces<DocumentResponse>();
 
         endpoints
-            .MapPost(
-                "resumes/recommend",
+            .MapGet(
+                "resumes/{id:guid}/recommendations",
                 async (
-                    GenerateRecommendationsRequest request,
+                    Guid id,
                     IAmazonS3 s3Client,
                     IOptions<S3Settings> s3Settings,
                     AppDbContext db,
-                    AiService aiService
+                    AiService aiService,
+                    bool mockData = false
                 ) =>
                 {
-                    if (request.MockData)
+                    if (mockData)
                     {
                         return Results.Ok(MockResumeRecommendations.Response);
                     }
 
-                    var documentRecord = await db.Documents.FindAsync(request.Id);
+                    var documentRecord = await db.Documents.FindAsync(id);
                     if (documentRecord == null)
                     {
                         return Results.NotFound("Document not found.");
@@ -220,7 +221,6 @@ public static class DocxUploadEndpoints
                     return Results.Ok(recommendations);
                 }
             )
-            .DisableAntiforgery()
             .Produces<ResumeAiResponse>();
 
         endpoints

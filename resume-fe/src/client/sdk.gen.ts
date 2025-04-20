@@ -13,8 +13,8 @@ import type {
   GetResumesByIdResponse,
   PatchResumesByIdData,
   PatchResumesByIdResponse,
-  PostResumesRecommendData,
-  PostResumesRecommendResponse,
+  GetResumesByIdRecommendationsData,
+  GetResumesByIdRecommendationsResponse,
   PostResumesProcessRecommendationsData,
   PostResumesProcessRecommendationsResponse,
   GetData,
@@ -87,20 +87,18 @@ export const patchResumesById = <ThrowOnError extends boolean = false>(
   });
 };
 
-export const postResumesRecommend = <ThrowOnError extends boolean = false>(
-  options: Options<PostResumesRecommendData, ThrowOnError>,
+export const getResumesByIdRecommendations = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetResumesByIdRecommendationsData, ThrowOnError>,
 ) => {
-  return (options.client ?? _heyApiClient).post<
-    PostResumesRecommendResponse,
+  return (options.client ?? _heyApiClient).get<
+    GetResumesByIdRecommendationsResponse,
     unknown,
     ThrowOnError
   >({
-    url: "/resumes/recommend",
+    url: "/resumes/{id}/recommendations",
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
   });
 };
 

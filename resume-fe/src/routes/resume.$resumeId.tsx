@@ -4,8 +4,8 @@ import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
 import { useRef, useState } from "react";
 import {
   AiRecommendation,
+  getResumesByIdRecommendations,
   postResumesProcessRecommendations,
-  postResumesRecommend,
 } from "@/client";
 import { ReccCard } from "@/components/ReccCard";
 import { AiRecommendationExtended } from "@/types/AiRecommendationExtended";
@@ -58,9 +58,11 @@ function RouteComponent() {
   async function getRecommendations() {
     setRecommendations(undefined);
 
-    const response = await postResumesRecommend({
-      body: {
+    const response = await getResumesByIdRecommendations({
+      path: {
         id: resumeId,
+      },
+      query: {
         mockData: useMockData,
       },
     });

@@ -5,7 +5,7 @@ import {
   postResumes,
   getResumesById,
   patchResumesById,
-  postResumesRecommend,
+  getResumesByIdRecommendations,
   postResumesProcessRecommendations,
   get,
 } from "../sdk.gen";
@@ -20,8 +20,7 @@ import type {
   GetResumesByIdData,
   PatchResumesByIdData,
   PatchResumesByIdResponse,
-  PostResumesRecommendData,
-  PostResumesRecommendResponse,
+  GetResumesByIdRecommendationsData,
   PostResumesProcessRecommendationsData,
   PostResumesProcessRecommendationsResponse,
   GetData,
@@ -138,16 +137,16 @@ export const patchResumesByIdMutation = (
   return mutationOptions;
 };
 
-export const postResumesRecommendQueryKey = (
-  options: Options<PostResumesRecommendData>,
-) => createQueryKey("postResumesRecommend", options);
+export const getResumesByIdRecommendationsQueryKey = (
+  options: Options<GetResumesByIdRecommendationsData>,
+) => createQueryKey("getResumesByIdRecommendations", options);
 
-export const postResumesRecommendOptions = (
-  options: Options<PostResumesRecommendData>,
+export const getResumesByIdRecommendationsOptions = (
+  options: Options<GetResumesByIdRecommendationsData>,
 ) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await postResumesRecommend({
+      const { data } = await getResumesByIdRecommendations({
         ...options,
         ...queryKey[0],
         signal,
@@ -155,28 +154,8 @@ export const postResumesRecommendOptions = (
       });
       return data;
     },
-    queryKey: postResumesRecommendQueryKey(options),
+    queryKey: getResumesByIdRecommendationsQueryKey(options),
   });
-};
-
-export const postResumesRecommendMutation = (
-  options?: Partial<Options<PostResumesRecommendData>>,
-) => {
-  const mutationOptions: UseMutationOptions<
-    PostResumesRecommendResponse,
-    DefaultError,
-    Options<PostResumesRecommendData>
-  > = {
-    mutationFn: async (localOptions) => {
-      const { data } = await postResumesRecommend({
-        ...options,
-        ...localOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
 };
 
 export const postResumesProcessRecommendationsQueryKey = (
