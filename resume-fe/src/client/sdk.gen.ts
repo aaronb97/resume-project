@@ -14,7 +14,6 @@ import type {
   PatchResumesByIdData,
   PatchResumesByIdResponse,
   GetResumesByIdRecommendationsData,
-  GetResumesByIdRecommendationsResponse,
   PostResumesProcessRecommendationsData,
   PostResumesProcessRecommendationsResponse,
   GetData,
@@ -92,11 +91,7 @@ export const getResumesByIdRecommendations = <
 >(
   options: Options<GetResumesByIdRecommendationsData, ThrowOnError>,
 ) => {
-  return (options.client ?? _heyApiClient).get<
-    GetResumesByIdRecommendationsResponse,
-    unknown,
-    ThrowOnError
-  >({
+  return (options.client ?? _heyApiClient).get<unknown, unknown, ThrowOnError>({
     url: "/resumes/{id}/recommendations",
     ...options,
   });

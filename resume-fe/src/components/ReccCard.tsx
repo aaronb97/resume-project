@@ -1,10 +1,10 @@
 import { Check, X } from "lucide-react";
 import clsx from "clsx";
 import React from "react";
-import { AiRecommendation } from "@/client";
+import { AiRecommendationParsed } from "@/hooks/useRecommendationStream";
 
 export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
-  recc: AiRecommendation;
+  recc: AiRecommendationParsed;
   active: boolean;
   included: boolean;
   onClick: () => void;

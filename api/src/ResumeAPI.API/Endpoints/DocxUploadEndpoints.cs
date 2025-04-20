@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Amazon.S3;
 using Amazon.S3.Model;
 using DocumentFormat.OpenXml.Packaging;
@@ -180,18 +181,26 @@ public static class DocxUploadEndpoints
                     IOptions<S3Settings> s3Settings,
                     AppDbContext db,
                     AiService aiService,
+                    HttpResponse response,
                     bool mockData = false
                 ) =>
                 {
+                    response.Headers.ContentType = "application/x-ndjson";
+
                     if (mockData)
                     {
-                        return Results.Ok(MockResumeRecommendations.Response);
+                        await response.WriteAsync(
+                            JsonSerializer.Serialize(MockResumeRecommendations.Response) + "\n"
+                        );
+                        return;
                     }
 
                     var documentRecord = await db.Documents.FindAsync(id);
                     if (documentRecord == null)
                     {
-                        return Results.NotFound("Document not found.");
+                        response.StatusCode = StatusCodes.Status404NotFound;
+                        await response.WriteAsync(@"{""error"":""Document not found.""}" + "\n");
+                        return;
                     }
 
                     var getRequest = new GetObjectRequest
@@ -201,7 +210,6 @@ public static class DocxUploadEndpoints
                     };
 
                     using var getResponse = await s3Client.GetObjectAsync(getRequest);
-
                     using var s3Stream = new MemoryStream();
                     await getResponse.ResponseStream.CopyToAsync(s3Stream);
                     s3Stream.Position = 0;
@@ -211,17 +219,20 @@ public static class DocxUploadEndpoints
                     editableStream.Position = 0;
 
                     using var wordDoc = WordprocessingDocument.Open(editableStream, true);
-
-                    var recommendations = await aiService.GetRecommendations(
-                        jobDescription: documentRecord.JobDescription,
-                        userNotes: documentRecord.UserNotes,
-                        resume: wordDoc.GetResumeText()
-                    );
-
-                    return Results.Ok(recommendations);
+                    await foreach (
+                        var chunk in aiService.GetRecommendationsStream(
+                            documentRecord.JobDescription,
+                            documentRecord.UserNotes,
+                            wordDoc.GetResumeText()
+                        )
+                    )
+                    {
+                        await response.WriteAsync(chunk);
+                        await response.Body.FlushAsync();
+                    }
                 }
             )
-            .Produces<ResumeAiResponse>();
+            .DisableAntiforgery();
 
         endpoints
             .MapPost(

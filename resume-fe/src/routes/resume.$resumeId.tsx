@@ -1,24 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
-import { useRef, useState } from "react";
-import {
-  AiRecommendation,
-  getResumesByIdRecommendations,
-  postResumesProcessRecommendations,
-} from "@/client";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { postResumesProcessRecommendations } from "@/client";
 import { ReccCard } from "@/components/ReccCard";
-import { AiRecommendationExtended } from "@/types/AiRecommendationExtended";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Download, FileText, RefreshCw, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobDescriptionUserNotesDialog } from "@/components/JobDescriptionUserNotesDialog";
 import { IconTooltipButton } from "@/components/IconTooltipButton";
-import { useMount } from "@/lib/useMount";
+import { useStream } from "@/hooks/useStream";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
 });
+
+interface AiRecommendation {
+  lineNum: number;
+  text: string;
+  rationale: string;
+}
+
+interface AiRecommendationParsed extends AiRecommendation {
+  included: boolean;
+}
+
+interface StreamResult {
+  recommendations: AiRecommendation[];
+}
 
 function RouteComponent() {
   const { resumeId } = Route.useParams();
@@ -27,7 +36,8 @@ function RouteComponent() {
   const { useMockData } = useSettingsStore();
 
   const [recommendations, setRecommendations] =
-    useState<AiRecommendationExtended[]>();
+    useState<AiRecommendationParsed[]>();
+
   const [activeCard, setActiveCard] = useState(0);
   const [isStale, setIsStale] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
@@ -37,51 +47,56 @@ function RouteComponent() {
     getResumesByIdOptions({ path: { id: resumeId } })
   );
 
-  useMount(() => {
-    getRecommendations();
+  const {
+    data: _data,
+    loading,
+    refetch,
+  } = useStream({
+    fetchFn: async () =>
+      await fetch(
+        `http://localhost:5185/resumes/${resumeId}/recommendations?mockData=${useMockData}`
+      ),
+    options: {},
   });
 
-  async function applyRecommendations(recommendations: AiRecommendation[]) {
-    setIsLoadingPreview(true);
+  const data = _data as StreamResult;
 
-    await postResumesProcessRecommendations({
-      body: {
-        id: resumeId,
-        recommendations,
-      },
-    });
-
-    setIsLoadingPreview(false);
-    setIsStale(false);
-  }
-
-  async function getRecommendations() {
-    setRecommendations(undefined);
-
-    const response = await getResumesByIdRecommendations({
-      path: {
-        id: resumeId,
-      },
-      query: {
-        mockData: useMockData,
-      },
-    });
-
-    const recommendationsResponse = response.data;
-
-    if (!recommendationsResponse) {
-      alert("failed to get recs");
-      return;
-    }
-
-    await applyRecommendations(recommendationsResponse.recommendations);
+  useEffect(() => {
+    if (!data) return;
 
     setRecommendations(
-      recommendationsResponse.recommendations.map((recc) => ({
-        ...recc,
+      data.recommendations?.map((recc) => ({
         included: true,
+        ...recc,
       }))
     );
+  }, [data]);
+
+  const applyRecommendations = useCallback(
+    async (recommendations: AiRecommendationParsed[]) => {
+      setIsLoadingPreview(true);
+
+      await postResumesProcessRecommendations({
+        body: {
+          id: resumeId,
+          recommendations,
+        },
+      });
+
+      setIsLoadingPreview(false);
+      setIsStale(false);
+    },
+    [resumeId, setIsLoadingPreview, setIsStale]
+  );
+
+  // useEffect(() => {
+  //   if (!loading && recommendations) {
+  //     applyRecommendations(recommendations);
+  //   }
+  // }, [applyRecommendations, loading, recommendations]);
+
+  async function getRecommendations() {
+    refetch();
   }
 
   if (!docData) return null;
@@ -114,7 +129,7 @@ function RouteComponent() {
         <div className="flex-1 flex flex-col gap-2 items-center bg-stone-900/50 rounded-lg p-4 border">
           {recommendations && (
             <>
-              {isLoadingPreview ? (
+              {isLoadingPreview || loading ? (
                 <div className="h-full">Loading preview...</div>
               ) : (
                 <iframe
@@ -183,7 +198,7 @@ function RouteComponent() {
                     }}
                     included={recc.included}
                     recc={recc}
-                    key={recc.text}
+                    key={recc.lineNum}
                     active={activeCard === i}
                     onMouseEnter={() => setActiveCard(i)}
                   />

@@ -23,7 +23,7 @@ public class AiService
             .Build();
     }
 
-    public async Task<ResumeAiResponse> GetRecommendations(
+    public async IAsyncEnumerable<string> GetRecommendationsStream(
         string jobDescription,
         string userNotes,
         string resume
@@ -79,10 +79,16 @@ END ADDITIONAL USER NOTES
 ";
         }
 
-        var result = await _kernel.InvokePromptAsync(prompt, new(executionSettings));
-
-        return JsonSerializer.Deserialize<ResumeAiResponse>(result.ToString())
-            ?? throw new JsonException("Failed to deserialize response.");
+        await foreach (
+            var msg in _kernel.InvokePromptStreamingAsync(prompt, new(executionSettings))
+        )
+        {
+            var content = (msg as StreamingChatMessageContent).Content;
+            if (content != null)
+            {
+                yield return content;
+            }
+        }
     }
 }
 
