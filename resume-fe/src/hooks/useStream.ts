@@ -8,7 +8,6 @@ export function useStream(fn: (options: Options<any>) => RequestResult) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const abortRef = useRef<AbortController>(null);
-  const startedRef = useRef(false);
 
   const start = useCallback(async () => {
     const controller = new AbortController();
@@ -54,14 +53,10 @@ export function useStream(fn: (options: Options<any>) => RequestResult) {
   }, [fn]);
 
   useEffect(() => {
-    if (!startedRef.current) {
-      startedRef.current = true;
-      start();
-    }
+    start();
 
     return () => {
       abortRef.current?.abort();
-      startedRef.current = false;
     };
   }, [start]);
 
