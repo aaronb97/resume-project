@@ -141,7 +141,7 @@ function RouteComponent() {
                   ref={iframeRef}
                   className="w-full h-full"
                   src={iframeUrl}
-                ></iframe>
+                />
               )}
 
               {isStale ? (

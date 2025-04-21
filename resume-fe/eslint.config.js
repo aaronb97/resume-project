@@ -4,6 +4,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import react from "eslint-plugin-react";
 import tseslint from "typescript-eslint";
+import stylistic from "@stylistic/eslint-plugin";
 
 export default tseslint.config(
   { ignores: ["dist"] },
@@ -22,6 +23,7 @@ export default tseslint.config(
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
       react: react,
+      "@stylistic": stylistic,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -32,6 +34,21 @@ export default tseslint.config(
       "react/jsx-newline": ["error", { prevent: true, allowMultilines: true }],
       "react/react-in-jsx-scope": 0,
       "react/jsx-uses-react": 0,
+      "react/jsx-boolean-value": ["error"],
+      "react/self-closing-comp": ["error"],
+      "react/jsx-no-useless-fragment": ["error", { allowExpressions: true }],
+      "@stylistic/padding-line-between-statements": [
+        "error",
+        {
+          blankLine: "always",
+          prev: [
+            "multiline-block-like",
+            "multiline-expression",
+            "multiline-const",
+          ],
+          next: "*",
+        },
+      ],
     },
   }
 );

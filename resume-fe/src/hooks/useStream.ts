@@ -86,6 +86,7 @@ export function lowercaseFirstKey(input: any): any {
       (acc, [key, value]) => {
         const newKey =
           key.length > 0 ? key[0].toLowerCase() + key.slice(1) : key;
+
         (acc as Record<string, unknown>)[newKey] = lowercaseFirstKey(value);
         return acc;
       },

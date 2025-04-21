@@ -13,6 +13,7 @@ export function TopBar() {
         toggleShowDevTools();
       }
     }
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [toggleShowDevTools]);

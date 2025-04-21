@@ -43,21 +43,27 @@ const createQueryKey = <TOptions extends Options>(
     _id: id,
     baseUrl: (options?.client ?? _heyApiClient).getConfig().baseUrl,
   } as QueryKey<TOptions>[0];
+
   if (infinite) {
     params._infinite = infinite;
   }
+
   if (options?.body) {
     params.body = options.body;
   }
+
   if (options?.headers) {
     params.headers = options.headers;
   }
+
   if (options?.path) {
     params.path = options.path;
   }
+
   if (options?.query) {
     params.query = options.query;
   }
+
   return [params];
 };
 
@@ -73,6 +79,7 @@ export const postResumesOptions = (options?: Options<PostResumesData>) => {
         signal,
         throwOnError: true,
       });
+
       return data;
     },
     queryKey: postResumesQueryKey(options),
@@ -93,9 +100,11 @@ export const postResumesMutation = (
         ...localOptions,
         throwOnError: true,
       });
+
       return data;
     },
   };
+
   return mutationOptions;
 };
 
@@ -111,6 +120,7 @@ export const getResumesByIdOptions = (options: Options<GetResumesByIdData>) => {
         signal,
         throwOnError: true,
       });
+
       return data;
     },
     queryKey: getResumesByIdQueryKey(options),
@@ -131,9 +141,11 @@ export const patchResumesByIdMutation = (
         ...localOptions,
         throwOnError: true,
       });
+
       return data;
     },
   };
+
   return mutationOptions;
 };
 
@@ -152,6 +164,7 @@ export const getResumesByIdRecommendationsOptions = (
         signal,
         throwOnError: true,
       });
+
       return data;
     },
     queryKey: getResumesByIdRecommendationsQueryKey(options),
@@ -173,6 +186,7 @@ export const postResumesProcessRecommendationsOptions = (
         signal,
         throwOnError: true,
       });
+
       return data;
     },
     queryKey: postResumesProcessRecommendationsQueryKey(options),
@@ -193,9 +207,11 @@ export const postResumesProcessRecommendationsMutation = (
         ...localOptions,
         throwOnError: true,
       });
+
       return data;
     },
   };
+
   return mutationOptions;
 };
 
@@ -211,6 +227,7 @@ export const getOptions = (options?: Options<GetData>) => {
         signal,
         throwOnError: true,
       });
+
       return data;
     },
     queryKey: getQueryKey(options),

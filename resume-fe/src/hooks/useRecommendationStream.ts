@@ -18,6 +18,7 @@ export function useRecommendationsStream(resumeId: string | undefined) {
   const [data, setData] = useState<{ Recommendations: AiRecommendation[] }>({
     Recommendations: [],
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const abortRef = useRef<AbortController>(null);
