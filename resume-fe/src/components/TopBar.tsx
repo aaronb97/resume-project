@@ -3,8 +3,14 @@ import { useEffect } from "react";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
 export function TopBar() {
-  const { useMockData, toggleMockData, showDevTools, toggleShowDevTools } =
-    useSettingsStore();
+  const {
+    useMockData,
+    toggleMockData,
+    showDevTools,
+    toggleShowDevTools,
+    viewer,
+    setViewer,
+  } = useSettingsStore();
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -23,14 +29,27 @@ export function TopBar() {
       <h1 className="text-sm font-semibold select-none">Resume Project</h1>
 
       {showDevTools && (
-        <div className="flex items-center gap-2">
-          <span className="text-sm select-none">Mock data</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
+            <span className="text-sm select-none">Mock data</span>
 
-          <Switch
-            checked={useMockData}
-            onCheckedChange={toggleMockData}
-            aria-label="Toggle mock data"
-          />
+            <Switch
+              checked={useMockData}
+              onCheckedChange={toggleMockData}
+              aria-label="Toggle mock data"
+            />
+          </div>
+
+          <select
+            value={viewer}
+            onChange={(e) =>
+              setViewer(e.target.value as "microsoft" | "google")
+            }
+            className="h-8 px-2 rounded bg-stone-800 text-sm"
+          >
+            <option value="microsoft">Microsoft viewer</option>
+            <option value="google">Google viewer</option>
+          </select>
         </div>
       )}
     </header>

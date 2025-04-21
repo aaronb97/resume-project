@@ -37,7 +37,7 @@ function RouteComponent() {
   const { resumeId } = Route.useParams();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  const { useMockData } = useSettingsStore();
+  const { useMockData, viewer } = useSettingsStore();
 
   const [recommendations, setRecommendations] =
     useState<AiRecommendationParsed[]>();
@@ -105,9 +105,14 @@ function RouteComponent() {
 
   if (!docData) return null;
 
-  const iframeUrl = `https://docs.google.com/gview?url=${encodeURIComponent(
-    docData.signedUrl
-  )}&embedded=true`;
+  const iframeUrl =
+    viewer === "microsoft"
+      ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+          docData.signedUrl
+        )}`
+      : `https://docs.google.com/gview?url=${encodeURIComponent(
+          docData.signedUrl
+        )}&embedded=true`;
 
   const actions = [
     {
