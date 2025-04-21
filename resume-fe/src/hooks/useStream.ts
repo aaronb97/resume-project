@@ -35,7 +35,10 @@ export function useStream(fn: (options: Options<any>) => RequestResult) {
 
       while (true) {
         const { value, done } = await reader.read();
-        if (done) break;
+        if (done) {
+          setLoading(false);
+          break;
+        }
 
         buffer += decoder.decode(value, { stream: true });
         const parsed = lowercaseFirstKey(parse(buffer));
@@ -46,9 +49,8 @@ export function useStream(fn: (options: Options<any>) => RequestResult) {
     } catch (err) {
       if (err instanceof Error && err.name !== "AbortError") {
         setError(err);
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
     }
   }, [fn]);
 
