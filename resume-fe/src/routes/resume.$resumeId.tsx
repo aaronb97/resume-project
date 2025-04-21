@@ -63,6 +63,8 @@ function RouteComponent() {
 
   const { data: _data, loading, refetch } = useStream(streamFn);
 
+  const [previousLoading, setPreviousLoading] = useState(false);
+
   const data = _data as StreamResult;
 
   useEffect(() => {
@@ -93,11 +95,14 @@ function RouteComponent() {
     [resumeId, setIsLoadingPreview, setIsStale]
   );
 
-  useEffect(() => {
-    if (!loading && recommendations) {
-      applyRecommendations(recommendations.filter((recc) => recc.included));
-    }
-  }, [applyRecommendations, loading, recommendations]);
+  if (!loading && previousLoading && recommendations) {
+    applyRecommendations(recommendations.filter((recc) => recc.included));
+    setPreviousLoading(false);
+  }
+
+  if (loading != previousLoading) {
+    setPreviousLoading(loading);
+  }
 
   async function getRecommendations() {
     refetch();
