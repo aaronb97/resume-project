@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { parse } from "partial-json";
-import { Options } from "@hey-api/client-fetch";
+import { Options, RequestResult } from "@hey-api/client-fetch";
 
 interface Params<O extends Options> {
-  fetchFn: (options: O) => Promise<Response>;
+  fetchFn: (options: O) => RequestResult;
   options: O;
 }
 
@@ -18,6 +18,7 @@ export function useStream<O extends Options = Options>({
   const startedRef = useRef(false);
 
   const start = useCallback(async () => {
+    console.log("starting...");
     const controller = new AbortController();
     abortRef.current = controller;
     setLoading(true);
@@ -25,11 +26,14 @@ export function useStream<O extends Options = Options>({
     setData(undefined);
 
     try {
-      const res = await fetchFn({
-        ...options,
-        headers: { ...options.headers, Accept: "application/x-ndjson" },
-        signal: controller.signal,
-      });
+      const res = (
+        await fetchFn({
+          ...options,
+          parseAs: "stream",
+          headers: { ...options.headers, Accept: "application/x-ndjson" },
+          signal: controller.signal,
+        })
+      ).response;
 
       if (!res.ok || !res.body) {
         throw new Error(`Request failed: ${res.status}`);
@@ -56,7 +60,8 @@ export function useStream<O extends Options = Options>({
     } finally {
       setLoading(false);
     }
-  }, [fetchFn, options]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!startedRef.current) {
@@ -64,7 +69,10 @@ export function useStream<O extends Options = Options>({
       start();
     }
 
-    return () => abortRef.current?.abort();
+    return () => {
+      abortRef.current?.abort();
+      startedRef.current = false;
+    };
   }, [start]);
 
   const refetch = useCallback(() => {

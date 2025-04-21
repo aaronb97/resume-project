@@ -2,7 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { postResumesProcessRecommendations } from "@/client";
+import {
+  getResumesByIdRecommendations,
+  postResumesProcessRecommendations,
+} from "@/client";
 import { ReccCard } from "@/components/ReccCard";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Download, FileText, RefreshCw, Upload } from "lucide-react";
@@ -52,11 +55,8 @@ function RouteComponent() {
     loading,
     refetch,
   } = useStream({
-    fetchFn: async () =>
-      await fetch(
-        `http://localhost:5185/resumes/${resumeId}/recommendations?mockData=${useMockData}`
-      ),
-    options: {},
+    fetchFn: getResumesByIdRecommendations,
+    options: { path: { id: resumeId }, query: { mockData: useMockData } },
   });
 
   const data = _data as StreamResult;
