@@ -53,13 +53,12 @@ function RouteComponent() {
 
   const streamFn = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (options: Options<any>) => {
-      return getResumesByIdRecommendations({
+    (options: Options<any>) =>
+      getResumesByIdRecommendations({
         ...options,
         path: { id: resumeId },
         query: { mockData: useMockData },
-      });
-    },
+      }),
     [resumeId, useMockData]
   );
 
