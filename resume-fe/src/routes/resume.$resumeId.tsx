@@ -94,11 +94,11 @@ function RouteComponent() {
     [resumeId, setIsLoadingPreview, setIsStale]
   );
 
-  // useEffect(() => {
-  //   if (!loading && recommendations) {
-  //     applyRecommendations(recommendations);
-  //   }
-  // }, [applyRecommendations, loading, recommendations]);
+  useEffect(() => {
+    if (!loading && recommendations) {
+      applyRecommendations(recommendations);
+    }
+  }, [applyRecommendations, loading, recommendations]);
 
   async function getRecommendations() {
     refetch();
