@@ -42,7 +42,6 @@ function RouteComponent() {
   const [recommendations, setRecommendations] =
     useState<AiRecommendationParsed[]>();
 
-  const [activeCard, setActiveCard] = useState(0);
   const [isStale, setIsStale] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -96,7 +95,7 @@ function RouteComponent() {
 
   useEffect(() => {
     if (!loading && recommendations) {
-      applyRecommendations(recommendations);
+      applyRecommendations(recommendations.filter((recc) => recc.included));
     }
   }, [applyRecommendations, loading, recommendations]);
 
@@ -184,7 +183,7 @@ function RouteComponent() {
             <div className="overflow-y-auto absolute top-0 bottom-0 flex flex-col gap-2 w-full">
               {recommendations
                 ?.filter((recc) => recc.text)
-                .map((recc, i) => (
+                .map((recc) => (
                   <ReccCard
                     onClick={() => {
                       setIsStale(true);
@@ -204,8 +203,6 @@ function RouteComponent() {
                     included={recc.included}
                     recc={recc}
                     key={recc.lineNum}
-                    active={activeCard === i}
-                    onMouseEnter={() => setActiveCard(i)}
                   />
                 )) ?? <>Loading your recommendations...</>}
             </div>

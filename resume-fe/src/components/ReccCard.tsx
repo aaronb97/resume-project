@@ -5,7 +5,6 @@ import { AiRecommendationParsed } from "@/hooks/useRecommendationStream";
 
 export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   recc: AiRecommendationParsed;
-  active: boolean;
   included: boolean;
   onClick: () => void;
 };
