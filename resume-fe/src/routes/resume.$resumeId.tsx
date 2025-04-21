@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { JobDescriptionUserNotesDialog } from "@/components/JobDescriptionUserNotesDialog";
 import { IconTooltipButton } from "@/components/IconTooltipButton";
 import { useStream } from "@/hooks/useStream";
+import { Options } from "@hey-api/client-fetch";
 
 export const Route = createFileRoute("/resume/$resumeId")({
   component: RouteComponent,
@@ -50,14 +51,19 @@ function RouteComponent() {
     getResumesByIdOptions({ path: { id: resumeId } })
   );
 
-  const {
-    data: _data,
-    loading,
-    refetch,
-  } = useStream({
-    fetchFn: getResumesByIdRecommendations,
-    options: { path: { id: resumeId }, query: { mockData: useMockData } },
-  });
+  const streamFn = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (options: Options<any>) => {
+      return getResumesByIdRecommendations({
+        ...options,
+        path: { id: resumeId },
+        query: { mockData: useMockData },
+      });
+    },
+    [resumeId, useMockData]
+  );
+
+  const { data: _data, loading, refetch } = useStream(streamFn);
 
   const data = _data as StreamResult;
 

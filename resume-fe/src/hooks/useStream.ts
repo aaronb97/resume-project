@@ -2,15 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { parse } from "partial-json";
 import { Options, RequestResult } from "@hey-api/client-fetch";
 
-interface Params<O extends Options> {
-  fetchFn: (options: O) => RequestResult;
-  options: O;
-}
-
-export function useStream<O extends Options = Options>({
-  fetchFn,
-  options,
-}: Params<O>) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useStream(fn: (options: Options<any>) => RequestResult) {
   const [data, setData] = useState<unknown | undefined>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -18,7 +11,6 @@ export function useStream<O extends Options = Options>({
   const startedRef = useRef(false);
 
   const start = useCallback(async () => {
-    console.log("starting...");
     const controller = new AbortController();
     abortRef.current = controller;
     setLoading(true);
@@ -27,10 +19,9 @@ export function useStream<O extends Options = Options>({
 
     try {
       const res = (
-        await fetchFn({
-          ...options,
+        await fn({
           parseAs: "stream",
-          headers: { ...options.headers, Accept: "application/x-ndjson" },
+          headers: { Accept: "application/x-ndjson" },
           signal: controller.signal,
         })
       ).response;
@@ -60,8 +51,7 @@ export function useStream<O extends Options = Options>({
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fn]);
 
   useEffect(() => {
     if (!startedRef.current) {
