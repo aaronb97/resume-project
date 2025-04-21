@@ -189,9 +189,18 @@ public static class DocxUploadEndpoints
 
                     if (mockData)
                     {
-                        await response.WriteAsync(
-                            JsonSerializer.Serialize(MockResumeRecommendations.Response) + "\n"
-                        );
+                        var json =
+                            JsonSerializer.Serialize(MockResumeRecommendations.Response) + "\n";
+                        const int chunkSize = 10;
+
+                        for (var i = 0; i < json.Length; i += chunkSize)
+                        {
+                            var chunk = json.Substring(i, Math.Min(chunkSize, json.Length - i));
+                            await response.WriteAsync(chunk);
+                            await response.Body.FlushAsync();
+                            await Task.Delay(20);
+                        }
+
                         return;
                     }
 
