@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { parse } from "partial-json";
+import { API_URL } from "@/envVars";
 
 export type AiRecommendation = {
   LineNum: number;
@@ -37,7 +38,7 @@ export function useRecommendationsStream(resumeId: string | undefined) {
     (async () => {
       try {
         const res = await fetch(
-          `http://localhost:5185/resumes/${resumeId}/recommendations`,
+          `${API_URL}/resumes/${resumeId}/recommendations`,
           {
             headers: { Accept: "application/x-ndjson" },
             signal: controller.signal,
