@@ -311,6 +311,18 @@ public static class DocxUploadEndpoints
                     };
                     await s3Client.PutObjectAsync(putRequest);
 
+                    var signedUrl = s3Client.GeneratePreSignedURL(
+                        s3Settings.Value.BucketName,
+                        previewKey,
+                        DateTime.UtcNow.AddDays(1),
+                        null
+                    );
+
+                    documentRecord.SignedUrl = signedUrl;
+
+                    db.Documents.Update(documentRecord);
+                    await db.SaveChangesAsync();
+
                     return Results.NoContent();
                 }
             )
