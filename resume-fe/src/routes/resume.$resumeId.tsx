@@ -1,6 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { getResumesByIdOptions } from "../client/@tanstack/react-query.gen";
+import {
+  getResumesByIdOptions,
+  getResumesByIdQueryKey,
+} from "../client/@tanstack/react-query.gen";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getResumesByIdRecommendations,
@@ -34,6 +37,7 @@ interface StreamResult {
 }
 
 function RouteComponent() {
+  const queryClient = useQueryClient();
   const { resumeId } = Route.useParams();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -89,10 +93,14 @@ function RouteComponent() {
         },
       });
 
+      await queryClient.invalidateQueries({
+        queryKey: getResumesByIdQueryKey({ path: { id: resumeId } }),
+      });
+
       setIsLoadingPreview(false);
       setIsStale(false);
     },
-    [resumeId, setIsLoadingPreview, setIsStale]
+    [queryClient, resumeId]
   );
 
   if (!loading && previousLoading && recommendations) {
