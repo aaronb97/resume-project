@@ -16,8 +16,26 @@ export function ReccCard({
   onClick,
   ...props
 }: CardProps) {
+  /* ---------- height-animation bookkeeping ---------- */
+  const innerRef = React.useRef<HTMLDivElement>(null);
+  const [maxHeight, setMaxHeight] = React.useState<number>();
+
+  React.useLayoutEffect(() => {
+    if (innerRef.current) {
+      setMaxHeight(innerRef.current.scrollHeight + 28);
+    }
+  }, [recc.text, recc.rationale]);
+
   return (
-    <div {...props} className={clsx("flex w-full", className)}>
+    <div
+      {...props}
+      className={clsx(
+        "flex w-full transition-[max-height] duration-500 ease-in-out",
+        className
+      )}
+      style={{ maxHeight }}
+    >
+      {/* include / exclude button */}
       <button
         type="button"
         onClick={onClick}
@@ -33,14 +51,29 @@ export function ReccCard({
         )}
       </button>
 
-      <div className="flex flex-col p-4 border-1 border-l-0 rounded-r-lg bg-stone-900 w-full">
-        <span className="font-medium">
-          <TypingText text={recc.text} />
-        </span>
+      {/* animated-height shell */}
+      <div
+        style={{ maxHeight }}
+        className={clsx(
+          `
+          overflow-y-hidden overflow-x-visible          /* ← hide only vertical overflow */
+          flex flex-col p-4 border-1 border-l-0 rounded-r-lg
+          bg-stone-900 w-full
+          `
+        )}
+      >
+        {/* real content we measure */}
+        <div ref={innerRef}>
+          {/* 1️⃣ TEXT — its own block so it gets its own line */}
+          <span className="block font-medium">
+            <TypingText text={recc.text} />
+          </span>
 
-        <span className="mt-1 text-xs text-neutral-400">
-          <TypingText text={recc.rationale} />
-        </span>
+          {/* 2️⃣ RATIONALE — separate line, never clipped */}
+          <span className="block mt-1 text-xs text-neutral-400">
+            <TypingText text={recc.rationale} />
+          </span>
+        </div>
       </div>
     </div>
   );
