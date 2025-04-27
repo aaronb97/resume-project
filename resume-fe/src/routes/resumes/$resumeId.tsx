@@ -23,6 +23,7 @@ import { JobDescriptionUserNotesDialog } from "@/components/JobDescriptionUserNo
 import { IconTooltipButton } from "@/components/IconTooltipButton";
 import { useStream } from "@/hooks/useStream";
 import { Options } from "@hey-api/client-fetch";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/resumes/$resumeId")({
   component: RouteComponent,
@@ -163,7 +164,7 @@ function RouteComponent() {
           {recommendations && (
             <>
               {isLoadingPreview || loading ? (
-                <div className="h-full">Loading preview...</div>
+                <Skeleton className="w-full h-full rounded-md" />
               ) : (
                 <iframe
                   ref={iframeRef}
