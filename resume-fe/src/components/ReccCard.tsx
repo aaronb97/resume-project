@@ -16,16 +16,27 @@ export function ReccCard({
   onClick,
   ...props
 }: CardProps) {
-  /* ---------- height-animation bookkeeping ---------- */
+  /* ───────────────── height-animation bookkeeping ───────────────── */
   const innerRef = React.useRef<HTMLDivElement>(null);
   const [maxHeight, setMaxHeight] = React.useState<number>();
 
-  React.useLayoutEffect(() => {
-    if (innerRef.current) {
-      setMaxHeight(innerRef.current.scrollHeight + 28);
-    }
-  }, [recc.text, recc.rationale]);
+  /** Measure once, or whenever text/rationale updates */
+  React.useLayoutEffect(measureAndSetMaxHeight, [recc.text, recc.rationale]);
 
+  /** Measure again on every window resize */
+  React.useEffect(() => {
+    window.addEventListener("resize", measureAndSetMaxHeight);
+    return () => window.removeEventListener("resize", measureAndSetMaxHeight);
+  }, []); // empty deps → listener added only once
+
+  /** helper shared by both effects */
+  function measureAndSetMaxHeight() {
+    if (innerRef.current) {
+      setMaxHeight(innerRef.current.scrollHeight + 28); // 28 = padding/etc.
+    }
+  }
+
+  /* ───────────────────────── component markup ───────────────────── */
   return (
     <div
       {...props}
@@ -56,20 +67,19 @@ export function ReccCard({
         style={{ maxHeight }}
         className={clsx(
           `
-          overflow-y-hidden overflow-x-visible          /* ← hide only vertical overflow */
+          overflow-y-hidden overflow-x-visible
           flex flex-col p-4 border-1 border-l-0 rounded-r-lg
           bg-stone-900 w-full
           `
         )}
       >
-        {/* real content we measure */}
         <div ref={innerRef}>
-          {/* 1️⃣ TEXT — its own block so it gets its own line */}
+          {/* TEXT */}
           <span className="block font-medium">
             <TypingText text={recc.text} />
           </span>
 
-          {/* 2️⃣ RATIONALE — separate line, never clipped */}
+          {/* RATIONALE */}
           <span className="block mt-1 text-xs text-neutral-400">
             <TypingText text={recc.rationale} />
           </span>
@@ -79,31 +89,23 @@ export function ReccCard({
   );
 }
 
-/**
- * TypingText – one-word-at-a-time wrapper that
- *  • keeps mid-word text unbreakable
- *  • animates every new character
- *  • lets the browser hide leading-line spaces
- */
+/* ──────────────────── TypingText stays unchanged ─────────────────── */
 function TypingText({ text }: { text: string | undefined }) {
   if (!text) return null;
 
   return (
     <>
       {text.split(/(\s+)/).map((token, tokenIdx) => {
-        /* 1️⃣ Pure-whitespace token — just one <span>, NOT inline-block */
+        // spaces (collapse if they lead a wrapped line)
         if (/^\s+$/.test(token)) {
           return (
-            <span // regular inline span (collapsible space)
-              key={tokenIdx}
-              className="animate-fade-in"
-            >
+            <span key={tokenIdx} className="animate-fade-in">
               {" "}
             </span>
           );
         }
 
-        /* 2️⃣ Normal word/punctuation – still protected from mid-word wraps */
+        // words/punctuation (unbreakable)
         return (
           <span key={tokenIdx} className="inline-block whitespace-nowrap">
             {token.split("").map((ch, i) => (
