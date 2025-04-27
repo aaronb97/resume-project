@@ -46,36 +46,34 @@ function RouteComponent() {
 
   const tooltipMessage = (() => {
     if (missingResume && missingJob)
-      return "Please add your resume and job description before proceeding.";
-
-    if (missingResume) return "Please add your resume before proceeding.";
-
-    if (missingJob) return "Please add your job description before proceeding.";
+      return "Please upload your resume and paste the job description before continuing.";
+    if (missingResume) return "Please upload your resume before continuing.";
+    if (missingJob)
+      return "Please paste the job description before continuing.";
     return "";
   })();
 
   const handleUpload = () => {
-    if (selectedFile) {
-      postResume.mutate(
-        { body: { file: selectedFile, jobDescription, userNotes } },
-        {
-          onSuccess: (data) => {
-            if (data.id) {
-              router.navigate({
-                to: "/resumes/$resumeId",
-                params: { resumeId: data.id },
-              });
-            }
-          },
-        }
-      );
-    } else {
-      alert("Please select a file first.");
-    }
+    if (!selectedFile) return alert("Please upload a resume first.");
+
+    postResume.mutate(
+      { body: { file: selectedFile, jobDescription, userNotes } },
+      {
+        onSuccess: (data) => {
+          if (data.id) {
+            router.navigate({
+              to: "/resumes/$resumeId",
+              params: { resumeId: data.id },
+            });
+          }
+        },
+      }
+    );
   };
 
   return (
-    <div className="flex gap-4 w-full flex-1">
+    <div className="flex flex-col md:flex-row gap-4 w-full flex-1">
+      {/* Resume Upload */}
       <div
         {...getRootProps()}
         className="w-full flex-1 flex flex-col justify-center rounded-lg p-4 text-center cursor-pointer bg-stone-900/50 border"
@@ -85,33 +83,38 @@ function RouteComponent() {
           <Upload />
 
           {isDragActive ? (
-            <p>Drop the file here ...</p>
+            <p className="px-4">Release to upload your resume…</p>
           ) : selectedFile ? (
-            <p>Selected file: {selectedFile.name}</p>
+            <p className="px-4">Selected resume: {selectedFile.name}</p>
           ) : (
-            <p>Drag and drop a .docx file here, or click to select one</p>
+            <p className="px-4">
+              Drag & drop your resume (.docx) here, or click to browse
+            </p>
           )}
         </div>
       </div>
 
+      {/* Form Fields */}
       <div className="flex-1 flex flex-col gap-8 rounded-lg border p-4 bg-stone-900/50 justify-center">
         <div className="grid w-full gap-1.5">
-          <Label>Job Description</Label>
+          <Label htmlFor="jobDescription">Job Description</Label>
 
           <Textarea
-            placeholder="Enter the job description you would like to fine tune your resume towards"
-            className="min-h-48"
             id="jobDescription"
+            placeholder="Paste the job description you want to target"
+            className="min-h-48"
+            value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
           />
         </div>
 
         <div className="grid w-full gap-1.5">
-          <Label>User Notes (optional)</Label>
+          <Label htmlFor="userNotes">Additional Notes (optional)</Label>
 
           <Textarea
-            placeholder="Please enter anything else you would like the AI to know"
             id="userNotes"
+            placeholder="Let us know anything else the AI should consider"
+            value={userNotes}
             onChange={(e) => setUserNotes(e.target.value)}
           />
         </div>
@@ -127,9 +130,7 @@ function RouteComponent() {
                   type="button"
                   className="w-full"
                 >
-                  {postResume.isPending
-                    ? "Uploading..."
-                    : "Optimize Your Resume"}
+                  {postResume.isPending ? "Uploading…" : "Optimize My Resume"}
                 </Button>
               </div>
             </TooltipTrigger>
