@@ -13,7 +13,7 @@ import {
   getResumesByIdOptions,
   patchResumesByIdMutation,
 } from "@/client/@tanstack/react-query.gen";
-import { Route } from "@/routes/resume.$resumeId";
+import { Route } from "@/routes/resumes/$resumeId";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 

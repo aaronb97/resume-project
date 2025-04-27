@@ -1,9 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, LinkProps } from "@tanstack/react-router";
 import {
   getResumesByIdOptions,
   getResumesByIdQueryKey,
-} from "../client/@tanstack/react-query.gen";
+} from "../../client/@tanstack/react-query.gen";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getResumesByIdRecommendations,
@@ -11,14 +11,20 @@ import {
 } from "@/client";
 import { ReccCard } from "@/components/ReccCard";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { Download, FileText, RefreshCw, Upload } from "lucide-react";
+import {
+  Download,
+  FileText,
+  LucideIcon,
+  RefreshCw,
+  Upload,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobDescriptionUserNotesDialog } from "@/components/JobDescriptionUserNotesDialog";
 import { IconTooltipButton } from "@/components/IconTooltipButton";
 import { useStream } from "@/hooks/useStream";
 import { Options } from "@hey-api/client-fetch";
 
-export const Route = createFileRoute("/resume/$resumeId")({
+export const Route = createFileRoute("/resumes/$resumeId")({
   component: RouteComponent,
 });
 
@@ -127,11 +133,16 @@ function RouteComponent() {
           docData.signedUrl
         )}&embedded=true`;
 
-  const actions = [
+  const actions: {
+    label: string;
+    icon: LucideIcon;
+    to?: LinkProps["to"];
+    onClick?: () => void;
+  }[] = [
     {
       label: "Upload Another Resume",
       icon: Upload,
-      to: "/upload",
+      to: "/resumes/upload",
     },
     {
       label: "Regenerate Recommendations",
@@ -143,7 +154,7 @@ function RouteComponent() {
       icon: FileText,
       onClick: () => setOpenDialog(true),
     },
-  ] as const;
+  ];
 
   return (
     <div className="flex-1 flex flex-col gap-2">

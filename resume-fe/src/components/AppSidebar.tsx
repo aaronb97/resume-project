@@ -25,7 +25,7 @@ type SidebarItem = {
 const items: SidebarItem[] = [
   {
     title: "Upload Another Resume",
-    to: "/upload",
+    to: "/resumes/upload",
     icon: Upload,
   },
 ];

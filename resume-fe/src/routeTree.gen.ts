@@ -11,15 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as UploadImport } from './routes/upload'
+import { Route as ResumesRouteImport } from './routes/resumes/route'
 import { Route as IndexImport } from './routes/index'
-import { Route as ResumeResumeIdImport } from './routes/resume.$resumeId'
+import { Route as ResumesUploadImport } from './routes/resumes/upload'
+import { Route as ResumesResumeIdImport } from './routes/resumes/$resumeId'
 
 // Create/Update Routes
 
-const UploadRoute = UploadImport.update({
-  id: '/upload',
-  path: '/upload',
+const ResumesRouteRoute = ResumesRouteImport.update({
+  id: '/resumes',
+  path: '/resumes',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -29,10 +30,16 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ResumeResumeIdRoute = ResumeResumeIdImport.update({
-  id: '/resume/$resumeId',
-  path: '/resume/$resumeId',
-  getParentRoute: () => rootRoute,
+const ResumesUploadRoute = ResumesUploadImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => ResumesRouteRoute,
+} as any)
+
+const ResumesResumeIdRoute = ResumesResumeIdImport.update({
+  id: '/$resumeId',
+  path: '/$resumeId',
+  getParentRoute: () => ResumesRouteRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -46,63 +53,85 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/upload': {
-      id: '/upload'
-      path: '/upload'
-      fullPath: '/upload'
-      preLoaderRoute: typeof UploadImport
+    '/resumes': {
+      id: '/resumes'
+      path: '/resumes'
+      fullPath: '/resumes'
+      preLoaderRoute: typeof ResumesRouteImport
       parentRoute: typeof rootRoute
     }
-    '/resume/$resumeId': {
-      id: '/resume/$resumeId'
-      path: '/resume/$resumeId'
-      fullPath: '/resume/$resumeId'
-      preLoaderRoute: typeof ResumeResumeIdImport
-      parentRoute: typeof rootRoute
+    '/resumes/$resumeId': {
+      id: '/resumes/$resumeId'
+      path: '/$resumeId'
+      fullPath: '/resumes/$resumeId'
+      preLoaderRoute: typeof ResumesResumeIdImport
+      parentRoute: typeof ResumesRouteImport
+    }
+    '/resumes/upload': {
+      id: '/resumes/upload'
+      path: '/upload'
+      fullPath: '/resumes/upload'
+      preLoaderRoute: typeof ResumesUploadImport
+      parentRoute: typeof ResumesRouteImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface ResumesRouteRouteChildren {
+  ResumesResumeIdRoute: typeof ResumesResumeIdRoute
+  ResumesUploadRoute: typeof ResumesUploadRoute
+}
+
+const ResumesRouteRouteChildren: ResumesRouteRouteChildren = {
+  ResumesResumeIdRoute: ResumesResumeIdRoute,
+  ResumesUploadRoute: ResumesUploadRoute,
+}
+
+const ResumesRouteRouteWithChildren = ResumesRouteRoute._addFileChildren(
+  ResumesRouteRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/upload': typeof UploadRoute
-  '/resume/$resumeId': typeof ResumeResumeIdRoute
+  '/resumes': typeof ResumesRouteRouteWithChildren
+  '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/resumes/upload': typeof ResumesUploadRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/upload': typeof UploadRoute
-  '/resume/$resumeId': typeof ResumeResumeIdRoute
+  '/resumes': typeof ResumesRouteRouteWithChildren
+  '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/resumes/upload': typeof ResumesUploadRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/upload': typeof UploadRoute
-  '/resume/$resumeId': typeof ResumeResumeIdRoute
+  '/resumes': typeof ResumesRouteRouteWithChildren
+  '/resumes/$resumeId': typeof ResumesResumeIdRoute
+  '/resumes/upload': typeof ResumesUploadRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/upload' | '/resume/$resumeId'
+  fullPaths: '/' | '/resumes' | '/resumes/$resumeId' | '/resumes/upload'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/upload' | '/resume/$resumeId'
-  id: '__root__' | '/' | '/upload' | '/resume/$resumeId'
+  to: '/' | '/resumes' | '/resumes/$resumeId' | '/resumes/upload'
+  id: '__root__' | '/' | '/resumes' | '/resumes/$resumeId' | '/resumes/upload'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  UploadRoute: typeof UploadRoute
-  ResumeResumeIdRoute: typeof ResumeResumeIdRoute
+  ResumesRouteRoute: typeof ResumesRouteRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  UploadRoute: UploadRoute,
-  ResumeResumeIdRoute: ResumeResumeIdRoute,
+  ResumesRouteRoute: ResumesRouteRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -116,18 +145,26 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/upload",
-        "/resume/$resumeId"
+        "/resumes"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/upload": {
-      "filePath": "upload.tsx"
+    "/resumes": {
+      "filePath": "resumes/route.tsx",
+      "children": [
+        "/resumes/$resumeId",
+        "/resumes/upload"
+      ]
     },
-    "/resume/$resumeId": {
-      "filePath": "resume.$resumeId.tsx"
+    "/resumes/$resumeId": {
+      "filePath": "resumes/$resumeId.tsx",
+      "parent": "/resumes"
+    },
+    "/resumes/upload": {
+      "filePath": "resumes/upload.tsx",
+      "parent": "/resumes"
     }
   }
 }

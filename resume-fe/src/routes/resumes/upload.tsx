@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { postResumesMutation } from "../client/@tanstack/react-query.gen";
+import { postResumesMutation } from "../../client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Upload } from "lucide-react";
 
-export const Route = createFileRoute("/upload")({
+export const Route = createFileRoute("/resumes/upload")({
   component: RouteComponent,
 });
 
@@ -62,7 +62,7 @@ function RouteComponent() {
           onSuccess: (data) => {
             if (data.id) {
               router.navigate({
-                to: "/resume/$resumeId",
+                to: "/resumes/$resumeId",
                 params: { resumeId: data.id },
               });
             }
