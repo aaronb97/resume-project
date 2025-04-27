@@ -80,39 +80,34 @@ export function ReccCard({
 }
 
 /**
- * Splits the incoming string into <span>‘s so that
- * newly-added characters (because the prop changed)
- * are brand-new DOM nodes.  Each span gets the
- * `animate-fade-in` class, which runs exactly once
- * when the node is inserted.
+ * TypingText – one-word-at-a-time wrapper that
+ *  • keeps mid-word text unbreakable
+ *  • animates every new character
+ *  • lets the browser hide leading-line spaces
  */
 function TypingText({ text }: { text: string | undefined }) {
+  if (!text) return null;
+
   return (
     <>
-      {text?.split(/(\s+)/).map((token, tokenIdx) => {
-        // === 1. The token is pure whitespace =========================
+      {text.split(/(\s+)/).map((token, tokenIdx) => {
+        /* 1️⃣ Pure-whitespace token — just one <span>, NOT inline-block */
         if (/^\s+$/.test(token)) {
-          return token.split("").map((_, i) => (
-            <span
-              key={`${tokenIdx}-${i}`}
-              className="animate-fade-in inline-block"
+          return (
+            <span // regular inline span (collapsible space)
+              key={tokenIdx}
+              className="animate-fade-in"
             >
-              {"\u00A0" /* non-breaking space keeps the gap visible */}
+              {" "}
             </span>
-          ));
+          );
         }
 
-        // === 2. The token is a word or punctuation ===================
+        /* 2️⃣ Normal word/punctuation – still protected from mid-word wraps */
         return (
-          <span // <– one wrapper per word
-            key={tokenIdx}
-            className="inline-block whitespace-nowrap" /* <- no mid-word wraps */
-          >
+          <span key={tokenIdx} className="inline-block whitespace-nowrap">
             {token.split("").map((ch, i) => (
-              <span
-                key={`${tokenIdx}-${i}`}
-                className="animate-fade-in inline-block"
-              >
+              <span key={`${tokenIdx}-${i}`} className="animate-fade-in">
                 {ch}
               </span>
             ))}
