@@ -30,7 +30,7 @@ export function ReccCard({
     <div
       {...props}
       className={clsx(
-        "flex w-full transition-[max-height] duration-500 ease-in-out",
+        "flex w-full transition-[max-height] duration-500 ease-in-out animate-card-entry",
         className
       )}
       style={{ maxHeight }}

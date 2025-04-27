@@ -234,7 +234,7 @@ function RouteComponent() {
                     recc={recc}
                     key={recc.lineNum}
                   />
-                )) ?? <>Loading your recommendations...</>}
+                )) ?? null}
             </div>
           </div>
         </div>
