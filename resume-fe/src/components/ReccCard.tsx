@@ -89,25 +89,14 @@ export function ReccCard({
   );
 }
 
-/* ──────────────────── TypingText stays unchanged ─────────────────── */
 function TypingText({ text }: { text: string | undefined }) {
   if (!text) return null;
 
   return (
     <>
       {text.split(/(\s+)/).map((token, tokenIdx) => {
-        // spaces (collapse if they lead a wrapped line)
-        if (/^\s+$/.test(token)) {
-          return (
-            <span key={tokenIdx} className="animate-fade-in">
-              {" "}
-            </span>
-          );
-        }
-
-        // words/punctuation (unbreakable)
         return (
-          <span key={tokenIdx} className="inline-block whitespace-nowrap">
+          <span key={tokenIdx} className="whitespace-pre-wrap">
             {token.split("").map((ch, i) => (
               <span key={`${tokenIdx}-${i}`} className="animate-fade-in">
                 {ch}
