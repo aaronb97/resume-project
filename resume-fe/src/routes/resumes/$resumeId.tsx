@@ -90,13 +90,13 @@ function RouteComponent() {
   }, [data]);
 
   const applyRecommendations = useCallback(
-    async (recommendations: AiRecommendationParsed[]) => {
+    async (recs: AiRecommendationParsed[]) => {
       setIsLoadingPreview(true);
 
       await postResumesProcessRecommendations({
         body: {
           id: resumeId,
-          recommendations,
+          recommendations: recs,
         },
       });
 
@@ -111,7 +111,7 @@ function RouteComponent() {
   );
 
   if (!loading && previousLoading && recommendations) {
-    applyRecommendations(recommendations.filter((recc) => recc.included));
+    applyRecommendations(recommendations.filter((r) => r.included));
     setPreviousLoading(false);
   }
 
@@ -178,7 +178,7 @@ function RouteComponent() {
                   variant="secondary"
                   onClick={() =>
                     applyRecommendations(
-                      recommendations.filter((recc) => recc.included)
+                      recommendations.filter((r) => r.included)
                     )
                   }
                   disabled={isLoadingPreview}
@@ -210,32 +210,26 @@ function RouteComponent() {
           </div>
 
           <div className="relative w-full flex-1">
-            {/* Column‑reverse trick keeps the scrollbar pinned to the bottom */}
             <div className="overflow-y-auto absolute inset-0 flex flex-col-reverse gap-2 w-full">
               {recommendations
-                ?.filter((recc) => recc.text)
-                .slice() // maintain chronological order while using column‑reverse
+                ?.filter((r) => r.text)
+                .slice()
                 .reverse()
-                .map((recc) => (
+                .map((r) => (
                   <ReccCard
+                    key={r.lineNum}
+                    included={r.included}
+                    text={r.text}
+                    rationale={r.rationale}
                     onClick={() => {
                       setIsStale(true);
-
                       setRecommendations(
-                        recommendations.map((nextRecc) => {
-                          if (nextRecc.lineNum !== recc.lineNum)
-                            return nextRecc;
-
-                          return {
-                            ...nextRecc,
-                            included: !nextRecc.included,
-                          };
+                        recommendations.map((next) => {
+                          if (next.lineNum !== r.lineNum) return next;
+                          return { ...next, included: !next.included };
                         })
                       );
                     }}
-                    included={recc.included}
-                    recc={recc}
-                    key={recc.lineNum}
                   />
                 )) ?? null}
             </div>
