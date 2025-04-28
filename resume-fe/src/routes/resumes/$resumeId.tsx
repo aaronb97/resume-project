@@ -80,10 +80,29 @@ function RouteComponent() {
 
   useEffect(() => {
     if (!data) return;
+
     setRecommendations(
-      data.recommendations?.map((recc) => ({ included: true, ...recc })),
+      data.recommendations?.map((recc) => {
+        const originalText = docData?.resumeParts.find(
+          (part) => part.lineNumber === recc.lineNum,
+        )?.text;
+
+        const text = (() => {
+          if (originalText?.endsWith(".") && !recc.text?.endsWith(".")) {
+            return recc.text + ".";
+          }
+
+          if (!originalText?.endsWith(".") && recc.text?.endsWith(".")) {
+            return recc.text.slice(0, recc.text.length - 1);
+          }
+
+          return recc.text;
+        })();
+
+        return { included: true, ...recc, text };
+      }),
     );
-  }, [data]);
+  }, [data, docData?.resumeParts, loading]);
 
   const applyRecommendations = useCallback(
     async (reccs: AiRecommendationParsed[]) => {
