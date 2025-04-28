@@ -7,9 +7,11 @@ interface SettingsState {
   useMockData: boolean;
   showDevTools: boolean;
   viewer: Viewer;
+  showRemovedText: boolean;
   toggleMockData: () => void;
   toggleShowDevTools: () => void;
   setViewer: (viewer: Viewer) => void;
+  toggleShowRemovedText: () => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -18,9 +20,12 @@ export const useSettingsStore = create<SettingsState>()(
       useMockData: false,
       showDevTools: false,
       viewer: "microsoft",
+      showRemovedText: true,
       toggleMockData: () => set({ useMockData: !get().useMockData }),
       toggleShowDevTools: () => set({ showDevTools: !get().showDevTools }),
       setViewer: (viewer) => set({ viewer }),
+      toggleShowRemovedText: () =>
+        set({ showRemovedText: !get().showRemovedText }),
     }),
     { name: "settings" },
   ),

@@ -15,6 +15,7 @@ import {
   FileText,
   LucideIcon,
   RefreshCw,
+  Strikethrough,
   Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,8 @@ function RouteComponent() {
   const { resumeId } = Route.useParams();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  const { useMockData, viewer } = useSettingsStore();
+  const { useMockData, viewer, toggleShowRemovedText, showRemovedText } =
+    useSettingsStore();
 
   const [recommendations, setRecommendations] =
     useState<AiRecommendationParsed[]>();
@@ -187,15 +189,24 @@ function RouteComponent() {
         </div>
 
         <div className="flex-1 flex flex-col gap-1 bg-stone-900/50 rounded-2xl px-4 py-2 border-1">
-          <div className="flex gap-2">
-            {actions.map(({ label, icon, ...rest }) => (
-              <IconTooltipButton
-                key={label}
-                label={label}
-                icon={icon}
-                {...rest}
-              />
-            ))}
+          <div className="flex justify-between w-full mb-2">
+            <div className="flex gap-2">
+              {actions.map(({ label, icon, ...rest }) => (
+                <IconTooltipButton
+                  key={label}
+                  label={label}
+                  icon={icon}
+                  {...rest}
+                />
+              ))}
+            </div>
+
+            <IconTooltipButton
+              label="Toggle Removed Text Visibility"
+              onClick={toggleShowRemovedText}
+              icon={Strikethrough}
+              variant={showRemovedText ? "default" : "ghost"}
+            />
           </div>
 
           <div className="relative w-full flex-1">

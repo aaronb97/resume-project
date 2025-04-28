@@ -3,6 +3,7 @@ import { Check, X } from "lucide-react";
 import React from "react";
 import { diffWords } from "diff";
 import { Skeleton } from "./ui/skeleton";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 interface ReccCardProps extends React.HTMLAttributes<HTMLDivElement> {
   lineNum: number;
@@ -27,12 +28,17 @@ export const ReccCard = React.memo(function ReccCard({
 }: ReccCardProps) {
   const innerRef = React.useRef<HTMLDivElement>(null);
   const [maxHeight, setMaxHeight] = React.useState(0);
+  const { showRemovedText } = useSettingsStore();
 
-  const diff = diffWords(originalText, text ?? "");
+  const diff = diffWords(originalText, text ?? "").filter((val) => {
+    if (!showRemovedText && val.removed) return false;
+
+    return true;
+  });
 
   React.useLayoutEffect(() => {
     if (innerRef.current) setMaxHeight(innerRef.current.scrollHeight + 28);
-  }, [text, rationale]);
+  }, [text, rationale, showRemovedText]);
 
   React.useEffect(() => {
     function measure() {
