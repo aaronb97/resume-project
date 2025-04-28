@@ -18,7 +18,7 @@ export function ReccCard({
 }: CardProps) {
   /* ───────────────── height-animation bookkeeping ───────────────── */
   const innerRef = React.useRef<HTMLDivElement>(null);
-  const [maxHeight, setMaxHeight] = React.useState<number>();
+  const [maxHeight, setMaxHeight] = React.useState<number>(0);
 
   /** Measure once, or whenever text/rationale updates */
   React.useLayoutEffect(measureAndSetMaxHeight, [recc.text, recc.rationale]);

@@ -115,7 +115,7 @@ function RouteComponent() {
     setPreviousLoading(false);
   }
 
-  if (loading != previousLoading) {
+  if (loading !== previousLoading) {
     setPreviousLoading(loading);
   }
 
@@ -210,9 +210,12 @@ function RouteComponent() {
           </div>
 
           <div className="relative w-full flex-1">
-            <div className="overflow-y-auto absolute top-0 bottom-0 flex flex-col gap-2 w-full">
+            {/* Column‑reverse trick keeps the scrollbar pinned to the bottom */}
+            <div className="overflow-y-auto absolute inset-0 flex flex-col-reverse gap-2 w-full">
               {recommendations
                 ?.filter((recc) => recc.text)
+                .slice() // maintain chronological order while using column‑reverse
+                .reverse()
                 .map((recc) => (
                   <ReccCard
                     onClick={() => {
