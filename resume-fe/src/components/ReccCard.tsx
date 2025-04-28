@@ -124,7 +124,7 @@ function TypingText({
           className={clsx(
             "whitespace-pre-wrap",
             added && "text-emerald-300",
-            removed && "text-neutral-500 line-through",
+            removed && "text-neutral-500 line-through font-normal",
           )}
         >
           {token.split("").map((ch, i) => (
