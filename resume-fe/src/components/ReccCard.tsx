@@ -80,7 +80,7 @@ export const ReccCard = React.memo(function ReccCard({
             ))}
           </span>
 
-          <span className="block mt-1 text-xs text-neutral-300 italic">
+          <span className="block mt-1 text-xs text-neutral-400 italic">
             <TypingText text={rationale} />
           </span>
         </div>
