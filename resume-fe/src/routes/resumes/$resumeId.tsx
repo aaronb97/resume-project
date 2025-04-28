@@ -196,10 +196,10 @@ function RouteComponent() {
                   <RefreshCw /> Regenerate Preview
                 </Button>
               ) : (
-                <Button asChild className="w-36" variant="secondary">
+                <Button asChild variant="secondary">
                   <a href={docData.signedUrl} download="Your Optimized Resume">
                     <Download className="mr-2 h-4 w-4" />
-                    Download
+                    Download Optimized Resume
                   </a>
                 </Button>
               )}
