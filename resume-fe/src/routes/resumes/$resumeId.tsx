@@ -217,6 +217,7 @@ function RouteComponent() {
                     rationale={r.rationale}
                     included={r.included}
                     onToggleIncluded={handleToggle}
+                    loading={loading}
                   />
                 )) ?? null}
             </div>

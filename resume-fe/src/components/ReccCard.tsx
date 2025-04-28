@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { Check, X } from "lucide-react";
 import React from "react";
 import { diffWords } from "diff";
+import { Skeleton } from "./ui/skeleton";
 
 interface ReccCardProps extends React.HTMLAttributes<HTMLDivElement> {
   lineNum: number;
@@ -10,6 +11,7 @@ interface ReccCardProps extends React.HTMLAttributes<HTMLDivElement> {
   originalText: string;
   included: boolean;
   onToggleIncluded: (lineNum: number) => void;
+  loading: boolean;
 }
 
 export const ReccCard = React.memo(function ReccCard({
@@ -20,6 +22,7 @@ export const ReccCard = React.memo(function ReccCard({
   onToggleIncluded,
   originalText,
   className,
+  loading,
   ...props
 }: ReccCardProps) {
   const innerRef = React.useRef<HTMLDivElement>(null);
@@ -49,20 +52,24 @@ export const ReccCard = React.memo(function ReccCard({
       )}
       style={{ maxHeight }}
     >
-      <button
-        type="button"
-        onClick={() => onToggleIncluded(lineNum)}
-        className={clsx(
-          "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer rounded-l-lg",
-          included ? "bg-emerald-500" : "bg-neutral-800",
-        )}
-      >
-        {included ? (
-          <Check className="w-4 h-4 text-white" />
-        ) : (
-          <X className="w-4 h-4 text-white" />
-        )}
-      </button>
+      {loading ? (
+        <Skeleton className="w-8 rounded-none rounded-l-lg" />
+      ) : (
+        <button
+          type="button"
+          onClick={() => onToggleIncluded(lineNum)}
+          className={clsx(
+            "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer rounded-l-lg",
+            included ? "bg-emerald-500" : "bg-neutral-800",
+          )}
+        >
+          {included ? (
+            <Check className="w-4 h-4 text-white" />
+          ) : (
+            <X className="w-4 h-4 text-white" />
+          )}
+        </button>
+      )}
 
       <div
         style={{ maxHeight }}
@@ -76,12 +83,13 @@ export const ReccCard = React.memo(function ReccCard({
                 text={diffChunk.value}
                 added={diffChunk.added}
                 removed={diffChunk.removed}
+                loading={loading}
               />
             ))}
           </span>
 
           <span className="block mt-1 text-xs text-neutral-400 italic">
-            <TypingText text={rationale} />
+            <TypingText text={rationale} loading={loading} />
           </span>
         </div>
       </div>
@@ -93,11 +101,13 @@ function TypingText({
   text,
   added,
   removed,
+  loading,
 }: {
   text?: string;
   added?: boolean;
   removed?: boolean;
   className?: string;
+  loading: boolean;
 }) {
   if (!text) return null;
   return (
@@ -112,7 +122,10 @@ function TypingText({
           )}
         >
           {token.split("").map((ch, i) => (
-            <span key={`${tIdx}-${i}`} className="animate-fade-in">
+            <span
+              key={`${tIdx}-${i}`}
+              className={clsx(loading && "animate-fade-in")}
+            >
               {ch}
             </span>
           ))}
