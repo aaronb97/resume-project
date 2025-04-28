@@ -1,93 +1,90 @@
-import { Check, X } from "lucide-react";
 import clsx from "clsx";
+import { Check, X } from "lucide-react";
 import React from "react";
 
-export interface ReccCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface ReccCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  lineNum: number;
   text?: string;
   rationale?: string;
   included: boolean;
-  onClick: () => void;
+  onToggleIncluded: (lineNum: number) => void;
 }
 
-const ReccCardBase = React.forwardRef<HTMLDivElement, ReccCardProps>(
-  ({ text, rationale, included, onClick, className, ...props }, ref) => {
-    const innerRef = React.useRef<HTMLDivElement>(null);
-    const [maxHeight, setMaxHeight] = React.useState(0);
+export const ReccCard = React.memo(function ReccCard({
+  lineNum,
+  text,
+  rationale,
+  included,
+  onToggleIncluded,
+  className,
+  ...props
+}: ReccCardProps) {
+  const innerRef = React.useRef<HTMLDivElement>(null);
+  const [maxHeight, setMaxHeight] = React.useState(0);
 
-    const measure = React.useCallback(() => {
+  React.useLayoutEffect(() => {
+    if (innerRef.current) setMaxHeight(innerRef.current.scrollHeight + 28);
+  }, [text, rationale]);
+
+  React.useEffect(() => {
+    function measure() {
       if (innerRef.current) setMaxHeight(innerRef.current.scrollHeight + 28);
-    }, []);
+    }
 
-    React.useLayoutEffect(measure, [text, rationale, measure]);
-    React.useEffect(() => {
-      window.addEventListener("resize", measure);
-      return () => window.removeEventListener("resize", measure);
-    }, [measure]);
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
 
-    return (
-      <div
-        {...props}
-        ref={ref}
+  return (
+    <div
+      {...props}
+      className={clsx(
+        "flex w-full transition-[max-height] duration-500 ease-in-out animate-card-entry",
+        className
+      )}
+      style={{ maxHeight }}
+    >
+      <button
+        type="button"
+        onClick={() => onToggleIncluded(lineNum)}
         className={clsx(
-          "flex w-full transition-[max-height] duration-500 ease-in-out animate-card-entry",
-          className
+          "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer rounded-l-lg",
+          included ? "bg-emerald-500" : "bg-neutral-800"
         )}
-        style={{ maxHeight }}
       >
-        <button
-          type="button"
-          onClick={onClick}
-          className={clsx(
-            "flex flex-none items-center justify-center w-8 transition-colors cursor-pointer rounded-l-lg",
-            included ? "bg-emerald-500" : "bg-neutral-800"
-          )}
-        >
-          {included ? (
-            <Check className="w-4 h-4 text-white" />
-          ) : (
-            <X className="w-4 h-4 text-white" />
-          )}
-        </button>
+        {included ? (
+          <Check className="w-4 h-4 text-white" />
+        ) : (
+          <X className="w-4 h-4 text-white" />
+        )}
+      </button>
 
-        <div
-          style={{ maxHeight }}
-          className="overflow-y-hidden overflow-x-visible flex flex-col p-4 border-1 border-l-0 rounded-r-lg bg-stone-900 w-full"
-        >
-          <div ref={innerRef}>
-            <span className="block font-medium">
-              <TypingText text={text} />
-            </span>
+      <div
+        style={{ maxHeight }}
+        className="overflow-y-hidden overflow-x-visible flex flex-col p-4 border-1 border-l-0 rounded-r-lg bg-stone-900 w-full"
+      >
+        <div ref={innerRef}>
+          <span className="block font-medium">
+            <TypingText text={text} />
+          </span>
 
-            <span className="block mt-1 text-xs text-neutral-400">
-              <TypingText text={rationale} />
-            </span>
-          </div>
+          <span className="block mt-1 text-xs text-neutral-400">
+            <TypingText text={rationale} />
+          </span>
         </div>
       </div>
-    );
-  }
-);
-
-ReccCardBase.displayName = "ReccCard";
-
-function areEqual(prev: ReccCardProps, next: ReccCardProps) {
-  return (
-    prev.text === next.text &&
-    prev.rationale === next.rationale &&
-    prev.included === next.included
+    </div>
   );
-}
-
-export const ReccCard = React.memo(ReccCardBase, areEqual);
+});
 
 function TypingText({ text }: { text?: string }) {
   if (!text) return null;
   return (
     <>
-      {text.split(/(\s+)/).map((t, ti) => (
-        <span key={ti} className="whitespace-pre-wrap">
-          {t.split("").map((ch, ci) => (
-            <span key={`${ti}-${ci}`} className="animate-fade-in">
+      {text.split(/(\s+)/).map((token, tIdx) => (
+        <span key={tIdx} className="whitespace-pre-wrap">
+          {token.split("").map((ch, i) => (
+            <span key={`${tIdx}-${i}`} className="animate-fade-in">
               {ch}
             </span>
           ))}

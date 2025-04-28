@@ -9,7 +9,6 @@ import {
   getResumesByIdRecommendations,
   postResumesProcessRecommendations,
 } from "@/client";
-import { ReccCard } from "@/components/ReccCard";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import {
   Download,
@@ -24,6 +23,7 @@ import { IconTooltipButton } from "@/components/IconTooltipButton";
 import { useStream } from "@/hooks/useStream";
 import { Options } from "@hey-api/client-fetch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ReccCard } from "@/components/ReccCard";
 
 export const Route = createFileRoute("/resumes/$resumeId")({
   component: RouteComponent,
@@ -56,6 +56,7 @@ function RouteComponent() {
   const [isStale, setIsStale] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [previousLoading, setPreviousLoading] = useState(false);
 
   const { data: docData } = useQuery(
     getResumesByIdOptions({ path: { id: resumeId } })
@@ -73,31 +74,20 @@ function RouteComponent() {
   );
 
   const { data: _data, loading, refetch } = useStream(streamFn);
-
-  const [previousLoading, setPreviousLoading] = useState(false);
-
   const data = _data as StreamResult;
 
   useEffect(() => {
     if (!data) return;
-
     setRecommendations(
-      data.recommendations?.map((recc) => ({
-        included: true,
-        ...recc,
-      }))
+      data.recommendations?.map((recc) => ({ included: true, ...recc }))
     );
   }, [data]);
 
   const applyRecommendations = useCallback(
-    async (recs: AiRecommendationParsed[]) => {
+    async (reccs: AiRecommendationParsed[]) => {
       setIsLoadingPreview(true);
-
       await postResumesProcessRecommendations({
-        body: {
-          id: resumeId,
-          recommendations: recs,
-        },
+        body: { id: resumeId, recommendations: reccs },
       });
 
       await queryClient.invalidateQueries({
@@ -115,13 +105,16 @@ function RouteComponent() {
     setPreviousLoading(false);
   }
 
-  if (loading !== previousLoading) {
-    setPreviousLoading(loading);
-  }
+  if (loading !== previousLoading) setPreviousLoading(loading);
 
-  async function getRecommendations() {
-    refetch();
-  }
+  const handleToggle = useCallback((lineNum: number) => {
+    setIsStale(true);
+    setRecommendations((prev) =>
+      prev?.map((r) =>
+        r.lineNum === lineNum ? { ...r, included: !r.included } : r
+      )
+    );
+  }, []);
 
   if (!docData) return null;
 
@@ -140,15 +133,11 @@ function RouteComponent() {
     to?: LinkProps["to"];
     onClick?: () => void;
   }[] = [
-    {
-      label: "Upload Another Resume",
-      icon: Upload,
-      to: "/resumes/upload",
-    },
+    { label: "Upload Another Resume", icon: Upload, to: "/resumes/upload" },
     {
       label: "Regenerate Recommendations",
       icon: RefreshCw,
-      onClick: () => getRecommendations(),
+      onClick: () => refetch(),
     },
     {
       label: "Update Job Description / User Notes",
@@ -218,18 +207,11 @@ function RouteComponent() {
                 .map((r) => (
                   <ReccCard
                     key={r.lineNum}
-                    included={r.included}
+                    lineNum={r.lineNum}
                     text={r.text}
                     rationale={r.rationale}
-                    onClick={() => {
-                      setIsStale(true);
-                      setRecommendations(
-                        recommendations.map((next) => {
-                          if (next.lineNum !== r.lineNum) return next;
-                          return { ...next, included: !next.included };
-                        })
-                      );
-                    }}
+                    included={r.included}
+                    onToggleIncluded={handleToggle}
                   />
                 )) ?? null}
             </div>
@@ -242,7 +224,7 @@ function RouteComponent() {
         onOpenChange={() => setOpenDialog(false)}
         onSave={() => {
           setOpenDialog(false);
-          getRecommendations();
+          refetch();
         }}
       />
     </div>
