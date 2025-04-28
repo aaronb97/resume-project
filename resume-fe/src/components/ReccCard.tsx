@@ -39,7 +39,7 @@ export const ReccCard = React.memo(function ReccCard({
     <div
       {...props}
       className={clsx(
-        "flex w-full transition-[max-height] duration-500 ease-in-out animate-card-entry",
+        "flex w-full transition-[max-height] duration-500 ease-in-out animate-card-entry first:mb-auto",
         className
       )}
       style={{ maxHeight }}
