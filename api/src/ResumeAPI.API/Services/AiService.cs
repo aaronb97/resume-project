@@ -44,7 +44,8 @@ Do not change employment dates or job titles or section headers.
 Do not add new sections. Only consider content changes. 
 Do not reformat sections. 
 Do not change tools used in an achievement, the rewording must not lie. 
-Do not excessively summarize sentences. 
+Do not excessively summarize sentences.
+Do not mention line numbers in recommendation text. 
 Focus on rewording achievements to job terms used in the job description without changing original meaning.
 For each line given, alter the text to better match the job description. 
 Match punctuation of the original line. Lines that do not end in a period should not be altered to have a period.
