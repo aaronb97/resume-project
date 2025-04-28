@@ -88,7 +88,11 @@ function RouteComponent() {
         )?.text;
 
         const text = (() => {
-          if (originalText?.endsWith(".") && !recc.text?.endsWith(".")) {
+          if (
+            originalText?.endsWith(".") &&
+            !recc.text?.endsWith(".") &&
+            !loading
+          ) {
             return recc.text + ".";
           }
 
