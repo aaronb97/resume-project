@@ -42,7 +42,7 @@ export function useRecommendationsStream(resumeId: string | undefined) {
           {
             headers: { Accept: "application/x-ndjson" },
             signal: controller.signal,
-          }
+          },
         );
 
         if (!res.ok || !res.body) {

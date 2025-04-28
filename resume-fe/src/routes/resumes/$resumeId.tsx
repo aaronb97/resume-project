@@ -59,7 +59,7 @@ function RouteComponent() {
   const [previousLoading, setPreviousLoading] = useState(false);
 
   const { data: docData } = useQuery(
-    getResumesByIdOptions({ path: { id: resumeId } })
+    getResumesByIdOptions({ path: { id: resumeId } }),
   );
 
   const streamFn = useCallback(
@@ -70,7 +70,7 @@ function RouteComponent() {
         path: { id: resumeId },
         query: { mockData: useMockData },
       }),
-    [resumeId, useMockData]
+    [resumeId, useMockData],
   );
 
   const { data: _data, loading, refetch } = useStream(streamFn);
@@ -79,7 +79,7 @@ function RouteComponent() {
   useEffect(() => {
     if (!data) return;
     setRecommendations(
-      data.recommendations?.map((recc) => ({ included: true, ...recc }))
+      data.recommendations?.map((recc) => ({ included: true, ...recc })),
     );
   }, [data]);
 
@@ -97,7 +97,7 @@ function RouteComponent() {
       setIsLoadingPreview(false);
       setIsStale(false);
     },
-    [queryClient, resumeId]
+    [queryClient, resumeId],
   );
 
   if (!loading && previousLoading && recommendations) {
@@ -111,8 +111,8 @@ function RouteComponent() {
     setIsStale(true);
     setRecommendations((prev) =>
       prev?.map((r) =>
-        r.lineNum === lineNum ? { ...r, included: !r.included } : r
-      )
+        r.lineNum === lineNum ? { ...r, included: !r.included } : r,
+      ),
     );
   }, []);
 
@@ -121,10 +121,10 @@ function RouteComponent() {
   const iframeUrl =
     viewer === "microsoft"
       ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-          docData.signedUrl
+          docData.signedUrl,
         )}`
       : `https://docs.google.com/gview?url=${encodeURIComponent(
-          docData.signedUrl
+          docData.signedUrl,
         )}&embedded=true`;
 
   const actions: {
@@ -167,7 +167,7 @@ function RouteComponent() {
                   variant="secondary"
                   onClick={() =>
                     applyRecommendations(
-                      recommendations.filter((r) => r.included)
+                      recommendations.filter((r) => r.included),
                     )
                   }
                   disabled={isLoadingPreview}
@@ -206,6 +206,11 @@ function RouteComponent() {
                 .reverse()
                 .map((r) => (
                   <ReccCard
+                    originalText={
+                      docData.resumeParts.find(
+                        (part) => part.lineNumber === r.lineNum,
+                      )?.text ?? ""
+                    }
                     key={r.lineNum}
                     lineNum={r.lineNum}
                     text={r.text}

@@ -7,6 +7,7 @@ export type DocumentResponse = {
   signedUrl: string;
   jobDescription: string;
   userNotes: string;
+  resumeParts: Array<ResumePart>;
 };
 
 export type ProcessRecommendationsRequest = {
@@ -17,6 +18,11 @@ export type ProcessRecommendationsRequest = {
 export type RecommendationToProcess = {
   text: string;
   lineNum: number;
+};
+
+export type ResumePart = {
+  lineNumber: number;
+  text: string;
 };
 
 export type UpdateDocumentRequest = {

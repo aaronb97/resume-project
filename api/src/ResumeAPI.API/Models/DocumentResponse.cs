@@ -1,3 +1,5 @@
+using ResumeAPI.Utils;
+
 namespace ResumeAPI.Models;
 
 public class DocumentResponse
@@ -8,4 +10,5 @@ public class DocumentResponse
     public required string SignedUrl { get; set; }
     public required string JobDescription { get; set; }
     public required string UserNotes { get; set; }
+    public required ResumePart[] ResumeParts { get; set; } = Array.Empty<ResumePart>();
 }

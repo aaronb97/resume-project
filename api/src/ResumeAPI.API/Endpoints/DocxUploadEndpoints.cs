@@ -100,6 +100,7 @@ public static class DocxUploadEndpoints
                             SignedUrl = signedUrl,
                             JobDescription = jobDescription,
                             UserNotes = userNotes ?? "",
+                            ResumeParts = [],
                         }
                     );
                 }
@@ -110,12 +111,37 @@ public static class DocxUploadEndpoints
         endpoints
             .MapGet(
                 "resumes/{id:guid}",
-                async (Guid id, AppDbContext db) =>
+                async (
+                    Guid id,
+                    IAmazonS3 s3Client,
+                    IOptions<S3Settings> s3Settings,
+                    AppDbContext db
+                ) =>
                 {
                     var documentRecord = await db.Documents.FindAsync(id);
                     if (documentRecord == null)
                     {
                         return Results.NotFound("Document not found.");
+                    }
+
+                    // fetch the .docx from S3
+                    var getRequest = new GetObjectRequest
+                    {
+                        BucketName = s3Settings.Value.BucketName,
+                        Key = documentRecord.S3Key,
+                    };
+
+                    await using var s3Stream = new MemoryStream();
+                    using (var getResponse = await s3Client.GetObjectAsync(getRequest))
+                    {
+                        await getResponse.ResponseStream.CopyToAsync(s3Stream);
+                    }
+                    s3Stream.Position = 0;
+
+                    ResumePart[] resumeParts;
+                    using (var wordDoc = WordprocessingDocument.Open(s3Stream, false))
+                    {
+                        resumeParts = wordDoc.GetResumeParts();
                     }
 
                     return Results.Ok(
@@ -127,6 +153,7 @@ public static class DocxUploadEndpoints
                             SignedUrl = documentRecord.SignedUrl,
                             JobDescription = documentRecord.JobDescription,
                             UserNotes = documentRecord.UserNotes,
+                            ResumeParts = resumeParts,
                         }
                     );
                 }
@@ -165,6 +192,7 @@ public static class DocxUploadEndpoints
                             SignedUrl = documentRecord.SignedUrl,
                             JobDescription = documentRecord.JobDescription,
                             UserNotes = documentRecord.UserNotes,
+                            ResumeParts = [],
                         }
                     );
                 }

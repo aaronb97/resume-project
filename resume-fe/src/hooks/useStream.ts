@@ -92,7 +92,7 @@ export function lowercaseFirstKey(input: any): any {
         (acc as Record<string, unknown>)[newKey] = lowercaseFirstKey(value);
         return acc;
       },
-      {} as Record<string, unknown>
+      {} as Record<string, unknown>,
     );
   }
 

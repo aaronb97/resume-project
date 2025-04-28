@@ -22,6 +22,6 @@ export const useSettingsStore = create<SettingsState>()(
       toggleShowDevTools: () => set({ showDevTools: !get().showDevTools }),
       setViewer: (viewer) => set({ viewer }),
     }),
-    { name: "settings" }
-  )
+    { name: "settings" },
+  ),
 );

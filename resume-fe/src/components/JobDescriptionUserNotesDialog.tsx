@@ -24,7 +24,7 @@ export function JobDescriptionUserNotesDialog({
 }: DialogProps & { onSave: () => void }) {
   const { resumeId } = Route.useParams();
   const { data: docData } = useQuery(
-    getResumesByIdOptions({ path: { id: resumeId } })
+    getResumesByIdOptions({ path: { id: resumeId } }),
   );
 
   const updateDocument = useMutation(patchResumesByIdMutation());
@@ -82,7 +82,7 @@ export function JobDescriptionUserNotesDialog({
                   onSuccess: () => {
                     onSave();
                   },
-                }
+                },
               );
             }}
           >

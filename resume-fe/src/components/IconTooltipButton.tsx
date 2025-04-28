@@ -25,9 +25,7 @@ export function IconTooltipButton({
   disabled,
   variant = "ghost",
 }: IconTooltipButtonProps) {
-  const inner = (
-    <Icon className="h-4 w-4" />
-  );
+  const inner = <Icon className="h-4 w-4" />;
 
   return (
     <TooltipProvider>

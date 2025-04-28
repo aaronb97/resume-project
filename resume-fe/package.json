@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint:fix": "eslint . --fix && prettier --write .",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
     "@tanstack/react-router-devtools": "^1.116.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "diff": "^8.0.0-beta",
     "framer-motion": "^12.9.2",
     "lucide-react": "^0.488.0",
     "partial-json": "^0.1.7",
@@ -52,6 +53,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "prettier": "^3.5.3",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"
