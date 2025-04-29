@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -105,6 +106,7 @@ public static class DocxUploadEndpoints
                     );
                 }
             )
+            .RequireAuthorization()
             .DisableAntiforgery()
             .Produces<DocumentResponse>();
 
@@ -124,7 +126,6 @@ public static class DocxUploadEndpoints
                         return Results.NotFound("Document not found.");
                     }
 
-                    // fetch the .docx from S3
                     var getRequest = new GetObjectRequest
                     {
                         BucketName = s3Settings.Value.BucketName,
@@ -158,6 +159,7 @@ public static class DocxUploadEndpoints
                     );
                 }
             )
+            .RequireAuthorization()
             .Produces<DocumentResponse>();
 
         endpoints
@@ -197,6 +199,7 @@ public static class DocxUploadEndpoints
                     );
                 }
             )
+            .RequireAuthorization()
             .DisableAntiforgery()
             .Produces<DocumentResponse>();
 
@@ -210,9 +213,12 @@ public static class DocxUploadEndpoints
                     AppDbContext db,
                     AiService aiService,
                     HttpResponse response,
+                    ClaimsPrincipal user,
                     bool mockData = false
                 ) =>
                 {
+                    Console.WriteLine("User id " + user.FindFirstValue(ClaimTypes.NameIdentifier));
+
                     response.Headers.ContentType = "application/x-ndjson";
 
                     if (mockData)
@@ -269,6 +275,7 @@ public static class DocxUploadEndpoints
                     }
                 }
             )
+            .RequireAuthorization()
             .DisableAntiforgery();
 
         endpoints
@@ -354,6 +361,7 @@ public static class DocxUploadEndpoints
                     return Results.NoContent();
                 }
             )
+            .RequireAuthorization()
             .DisableAntiforgery()
             .Produces(204);
 

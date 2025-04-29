@@ -1,6 +1,9 @@
 using System.Text.Json.Serialization;
 using Amazon;
 using Amazon.S3;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -72,7 +75,20 @@ builder.Services.AddCors(options =>
     );
 });
 
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = "Firebase";
+        options.DefaultChallengeScheme = "Firebase";
+    })
+    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", _ => { });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -89,6 +105,15 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo API V1");
     });
 }
+
+FirebaseApp.Create(
+    new AppOptions()
+    {
+        Credential = GoogleCredential.FromJson(
+            builder.Configuration["Firebase:ServiceAccountJson"]
+        ),
+    }
+);
 
 app.MapDocxUpload();
 app.MapGet("/", () => "Hello World!");

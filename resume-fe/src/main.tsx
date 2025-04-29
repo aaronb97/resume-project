@@ -8,9 +8,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { client } from "./client/client.gen";
 import { API_URL } from "./envVars";
+import { auth } from "./firebase";
 
 client.setConfig({
   baseUrl: API_URL,
+});
+
+client.interceptors.request.use(async (request) => {
+  const token = await auth.currentUser?.getIdToken();
+  request.headers.set("Authorization", `Bearer ${token}`);
+  return request;
 });
 
 // Create a new router instance
