@@ -116,17 +116,21 @@ function TypingText({
   loading: boolean;
 }) {
   if (!text) return null;
+
+  const className = clsx(
+    "whitespace-pre-wrap",
+    added && "text-emerald-300",
+    removed && "text-neutral-500 line-through font-normal",
+  );
+
+  if (!loading) {
+    return <span className={className}>{text}</span>;
+  }
+
   return (
     <>
       {text.split(/(\s+)/).map((token, tIdx) => (
-        <span
-          key={tIdx}
-          className={clsx(
-            "whitespace-pre-wrap",
-            added && "text-emerald-300",
-            removed && "text-neutral-500 line-through font-normal",
-          )}
-        >
+        <span key={tIdx} className={className}>
           {token.split("").map((ch, i) => (
             <span
               key={`${tIdx}-${i}`}
