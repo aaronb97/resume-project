@@ -1,6 +1,6 @@
-namespace ResumeAPI.Utils;
+using ResumeAPI.Contracts;
 
-using ResumeAPI.Models;
+namespace ResumeAPI.Utils;
 
 public static class MockResumeRecommendations
 {

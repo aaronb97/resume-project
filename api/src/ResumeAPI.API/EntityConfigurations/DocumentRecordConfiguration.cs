@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ResumeAPI.Models;
+using ResumeAPI.Data;
 
 namespace ResumeAPI.EntityConfigurations;
 

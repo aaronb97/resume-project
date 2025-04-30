@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using ResumeAPI;
+using ResumeAPI.Data;
 using ResumeAPI.Endpoints;
-using ResumeAPI.Models;
 using ResumeAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);

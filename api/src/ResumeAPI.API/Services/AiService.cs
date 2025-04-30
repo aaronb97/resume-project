@@ -1,5 +1,5 @@
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using ResumeAPI.Models;
+using ResumeAPI.Contracts;
 
 namespace ResumeAPI.Services;
 

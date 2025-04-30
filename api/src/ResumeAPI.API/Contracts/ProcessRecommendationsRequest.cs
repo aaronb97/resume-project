@@ -1,4 +1,4 @@
-namespace ResumeAPI.Models;
+namespace ResumeAPI.Contracts;
 
 public class ProcessRecommendationsRequest
 {

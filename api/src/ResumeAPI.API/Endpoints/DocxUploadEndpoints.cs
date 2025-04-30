@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Text.Json;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -6,7 +5,8 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using ResumeAPI.Models;
+using ResumeAPI.Contracts;
+using ResumeAPI.Data;
 using ResumeAPI.Services;
 using ResumeAPI.Utils;
 
