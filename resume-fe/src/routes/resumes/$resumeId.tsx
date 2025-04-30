@@ -171,6 +171,15 @@ function RouteComponent() {
     },
   ];
 
+  const processedRecommendations = (() => {
+    if (!recommendations) return [];
+
+    return recommendations
+      .filter((rec) => rec.text)
+      .slice()
+      .reverse();
+  })();
+
   return (
     <div className="flex-1 flex flex-col gap-2">
       <div className="w-full flex gap-4 flex-1">
@@ -233,27 +242,23 @@ function RouteComponent() {
           </div>
 
           <div className="relative w-full flex-1">
-            <div className="overflow-y-auto absolute inset-0 flex flex-col-reverse gap-2 w-full">
-              {recommendations
-                ?.filter((r) => r.text)
-                .slice()
-                .reverse()
-                .map((r) => (
-                  <ReccCard
-                    originalText={
-                      docData.resumeParts.find(
-                        (part) => part.lineNumber === r.lineNum,
-                      )?.text ?? ""
-                    }
-                    key={r.lineNum}
-                    lineNum={r.lineNum}
-                    text={r.text}
-                    rationale={r.rationale}
-                    included={r.included}
-                    onToggleIncluded={handleToggle}
-                    loading={loading}
-                  />
-                )) ?? null}
+            <div className="overflow-y-auto absolute inset-0 flex gap-2 w-full flex-col-reverse">
+              {processedRecommendations.map((r) => (
+                <ReccCard
+                  originalText={
+                    docData.resumeParts.find(
+                      (part) => part.lineNumber === r.lineNum,
+                    )?.text ?? ""
+                  }
+                  key={r.lineNum}
+                  lineNum={r.lineNum}
+                  text={r.text}
+                  rationale={r.rationale}
+                  included={r.included}
+                  onToggleIncluded={handleToggle}
+                  loading={loading}
+                />
+              ))}
             </div>
           </div>
         </div>
