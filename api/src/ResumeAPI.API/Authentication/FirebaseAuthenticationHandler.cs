@@ -3,17 +3,25 @@ using System.Text.Encodings.Web;
 using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using ResumeAPI.Data;
+using UserRecord = ResumeAPI.Data.UserRecord;
 
 public sealed class FirebaseAuthenticationHandler
     : AuthenticationHandler<AuthenticationSchemeOptions>
 {
+    private readonly AppDbContext _db;
+
     public FirebaseAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ISystemClock clock
+        ISystemClock clock,
+        AppDbContext db
     )
-        : base(options, logger, encoder, clock) { }
+        : base(options, logger, encoder, clock)
+    {
+        _db = db;
+    }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -38,6 +46,13 @@ public sealed class FirebaseAuthenticationHandler
                 .ToList();
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, decoded.Uid));
+
+            var user = await _db.Users.FindAsync(decoded.Uid);
+            if (user is null)
+            {
+                _db.Users.Add(new UserRecord { Id = decoded.Uid });
+                await _db.SaveChangesAsync();
+            }
 
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);

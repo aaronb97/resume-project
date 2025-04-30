@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -220,6 +221,7 @@ public static class DocxUploadEndpoints
 
     private static async Task GetRecommendationsAsync(
         Guid id,
+        ClaimsPrincipal user,
         IAmazonS3 s3Client,
         IOptions<S3Settings> s3Settings,
         AppDbContext db,
@@ -230,11 +232,44 @@ public static class DocxUploadEndpoints
     {
         response.Headers.ContentType = "application/x-ndjson";
 
+        var uid = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(uid))
+        {
+            response.StatusCode = StatusCodes.Status401Unauthorized;
+            await response.WriteAsync("{\"error\":\"Unauthorized.\"}\n");
+            return;
+        }
+
+        var userRecord = await db.Users.FindAsync(uid);
+        if (userRecord == null)
+        {
+            response.StatusCode = StatusCodes.Status500InternalServerError;
+            await response.WriteAsync("{\"error\":\"User record missing.\"}\n");
+            return;
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        var shouldRefillRegens = now - userRecord.LastGeneration >= TimeSpan.FromHours(8);
+
+        if (userRecord.RemainingGenerations == 0 && !shouldRefillRegens)
+        {
+            response.StatusCode = StatusCodes.Status402PaymentRequired;
+            return;
+        }
+
+        if (shouldRefillRegens)
+        {
+            userRecord.RemainingGenerations = Math.Max(10, userRecord.RemainingGenerations);
+        }
+
+        userRecord.RemainingGenerations -= 1;
+        userRecord.LastGeneration = now;
+        await db.SaveChangesAsync();
+
         if (mockData)
         {
             var json = JsonSerializer.Serialize(MockResumeRecommendations.Response) + "\n";
             const int chunkSize = 10;
-
             for (var i = 0; i < json.Length; i += chunkSize)
             {
                 var chunk = json.Substring(i, Math.Min(chunkSize, json.Length - i));
@@ -242,7 +277,6 @@ public static class DocxUploadEndpoints
                 await response.Body.FlushAsync();
                 await Task.Delay(20);
             }
-
             return;
         }
 
@@ -250,7 +284,7 @@ public static class DocxUploadEndpoints
         if (documentRecord == null)
         {
             response.StatusCode = StatusCodes.Status404NotFound;
-            await response.WriteAsync("{\"error\":\"Document not found.\"}" + "\n");
+            await response.WriteAsync("{\"error\":\"Document not found.\"}\n");
             return;
         }
 

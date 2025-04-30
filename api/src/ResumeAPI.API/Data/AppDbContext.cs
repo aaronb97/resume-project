@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
         : base(options) { }
 
     public DbSet<DocumentRecord> Documents { get; set; }
+    public DbSet<UserRecord> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

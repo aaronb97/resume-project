@@ -75,8 +75,14 @@ function RouteComponent() {
     [resumeId, useMockData],
   );
 
-  const { data: _data, loading, refetch } = useStream(streamFn);
+  const { data: _data, loading, refetch, error } = useStream(streamFn);
   const data = _data as StreamResult;
+
+  useEffect(() => {
+    if (error) {
+      setRecommendations([]);
+    }
+  }, [error]);
 
   useEffect(() => {
     if (!data) return;
@@ -184,7 +190,7 @@ function RouteComponent() {
     <div className="flex-1 flex flex-col gap-2">
       <div className="w-full flex gap-4 flex-1">
         <div className="flex-1 flex flex-col gap-2 items-center bg-stone-900/50 rounded-lg p-4 border">
-          {recommendations && (
+          {recommendations && !error && (
             <>
               {isLoadingPreview || loading ? (
                 <Skeleton className="w-full h-full rounded-md" />
@@ -242,24 +248,36 @@ function RouteComponent() {
           </div>
 
           <div className="relative w-full flex-1">
-            <div className="overflow-y-auto absolute inset-0 flex gap-2 w-full flex-col-reverse">
-              {processedRecommendations.map((r) => (
-                <ReccCard
-                  originalText={
-                    docData.resumeParts.find(
-                      (part) => part.lineNumber === r.lineNum,
-                    )?.text ?? ""
-                  }
-                  key={r.lineNum}
-                  lineNum={r.lineNum}
-                  text={r.text}
-                  rationale={r.rationale}
-                  included={r.included}
-                  onToggleIncluded={handleToggle}
-                  loading={loading}
-                />
-              ))}
-            </div>
+            {error?.message.includes("402") && (
+              <>
+                Holey smokes! You ran out of free generations. If you would
+                really like to continue, it&apos;s possible that you can just
+                open this page in an incognito window. But I haven&apos;t tried
+                that, so I&apos;m not sure. Alternatively, you will be able to
+                generate more recommendations tomorrow.
+              </>
+            )}
+
+            {!error && (
+              <div className="overflow-y-auto absolute inset-0 flex gap-2 w-full flex-col-reverse">
+                {processedRecommendations.map((r) => (
+                  <ReccCard
+                    originalText={
+                      docData.resumeParts.find(
+                        (part) => part.lineNumber === r.lineNum,
+                      )?.text ?? ""
+                    }
+                    key={r.lineNum}
+                    lineNum={r.lineNum}
+                    text={r.text}
+                    rationale={r.rationale}
+                    included={r.included}
+                    onToggleIncluded={handleToggle}
+                    loading={loading}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
