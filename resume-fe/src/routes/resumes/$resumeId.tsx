@@ -116,6 +116,8 @@ function RouteComponent() {
 
   const applyRecommendations = useCallback(
     async (reccs: AiRecommendationParsed[]) => {
+      if (reccs.length === 0) return;
+
       setIsLoadingPreview(true);
       await postResumesProcessRecommendations({
         body: { id: resumeId, recommendations: reccs },
